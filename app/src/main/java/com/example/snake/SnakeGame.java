@@ -50,7 +50,7 @@ class SnakeGame extends SurfaceView implements Runnable{
     // And an apple
     private Apple mApple;
 
-
+   private Audio sGS;
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size) {
@@ -61,6 +61,9 @@ class SnakeGame extends SurfaceView implements Runnable{
         // How many blocks of the same size will fit into the height
         mNumBlocksHigh = size.y / blockSize;
 
+        sGS = new Audio(5);
+        sGS.load(context);
+        /*
         // Initialize the SoundPool
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
@@ -75,6 +78,7 @@ class SnakeGame extends SurfaceView implements Runnable{
         } else {
             mSP = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         }
+
         try {
             AssetManager assetManager = context.getAssets();
             AssetFileDescriptor descriptor;
@@ -88,7 +92,8 @@ class SnakeGame extends SurfaceView implements Runnable{
 
         } catch (IOException e) {
             // Error
-        }
+
+         */
 
         // Initialize the drawing objects
         mSurfaceHolder = getHolder();
@@ -182,13 +187,13 @@ class SnakeGame extends SurfaceView implements Runnable{
             mScore = mScore + 1;
 
             // Play a sound
-            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+            sGS.playSound(0);
         }
 
         // Did the snake die?
         if (mSnake.detectDeath()) {
             // Pause the game ready to start again
-            mSP.play(mCrashID, 1, 1, 0, 0, 1);
+            sGS.playSound(1);
 
             mPaused =true;
         }
