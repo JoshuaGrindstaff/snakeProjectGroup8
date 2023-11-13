@@ -23,7 +23,7 @@ public class Audio
                     .build();
 
             mSP = new SoundPool.Builder()
-                    .setMaxStreams(5)
+                    .setMaxStreams(maxStreams)
                     .setAudioAttributes(audioAttributes)
                     .build();
         } else {
