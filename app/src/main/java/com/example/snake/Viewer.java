@@ -86,9 +86,9 @@ public class Viewer extends SurfaceView implements Subject{
     }
 
     @Override
-    public void removeObserver(OnTouch Observer)
+    public void removeObserver(OnTouch observer)
     {
-        observers.remove(observers);
+        observers.remove(observer);
     }
 
     @Override
