@@ -1,4 +1,4 @@
-package com.example.snake;
+/*package com.example.snake;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,26 +9,13 @@ import android.view.SurfaceView;
 
 public class HUD
 {
-//    private static int DEFAULT_SCORE = 0;
-//    private static boolean PAUSE_AT_START = true;
-//    private Canvas mCanvas;
-//   private SurfaceHolder mSurfaceHolder;
-//   private Paint mPaint;
 
-
-    HUD()
+    public static void update(boolean mPaused, int mScore,SurfaceHolder mSurfaceHolder,Paint mPaint,Canvas mCanvas)
     {
-
-    }
-
-    public void update(boolean mPaused, int mScore,Snake mSnake,Apple mApple,Paint mPaint, SurfaceHolder mSurfaceHolder, Canvas mCanvas)
-    {
-        // Get a lock on the mCanvas
-
+        // Get a lock on the mCanvan
 
         if (mSurfaceHolder.getSurface().isValid()) {
             System.out.println("Valid");
-            mCanvas = mSurfaceHolder.lockCanvas();
 
             // Fill the screen with a color
             mCanvas.drawColor(Color.argb(255, 26, 128, 182));
@@ -40,8 +27,7 @@ public class HUD
             // Draw the score
             mCanvas.drawText("" + mScore, 20, 120, mPaint);
 
-            mApple.draw(mCanvas, mPaint);
-            mSnake.draw(mCanvas, mPaint);
+
 
             // Draw some text while paused
             if (mPaused) {
@@ -58,7 +44,6 @@ public class HUD
 
 
             // Unlock the mCanvas and reveal the graphics for this frame
-            mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
     }
-}
+}*/

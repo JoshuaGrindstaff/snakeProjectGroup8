@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class SnakeActivity extends Activity {
 
     // Declare an instance of SnakeGame
-    SnakeGame mSnakeGame;
+    private Viewer view;
+    private SnakeGame mSnakeGame;
+
 
     // Set the game up
     @Override
@@ -25,10 +27,14 @@ public class SnakeActivity extends Activity {
         display.getSize(size);
 
         // Create a new instance of the SnakeEngine class
-        mSnakeGame = new SnakeGame(this,size);
+        view = new Viewer(this);
+        mSnakeGame = new SnakeGame(this,size,view);
+        view.registerObserver(mSnakeGame);
+        // Create a new instance of the Draw clas
+
 
         // Make snakeEngine the view of the Activity
-        setContentView(mSnakeGame);
+        setContentView(view);
 
     }
 
