@@ -10,9 +10,10 @@ import java.io.IOException;
 import android.content.Context;
 public class Audio
 {
-    private SoundPool mSP;
+    private final SoundPool mSP;
     private int mEat_ID = -1;
     private int mCrashID = -1;
+    private int mJumpID = -1;
 
     Audio(int maxStreams)
     {
@@ -42,6 +43,9 @@ public class Audio
 
             descriptor = assetManager.openFd("snake_death.ogg");
             mCrashID = mSP.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("spring.wav");
+            mJumpID = mSP.load(descriptor, 0);
         } catch (IOException e) {
             // Error
         }
@@ -57,6 +61,8 @@ public class Audio
             case 1:
                 mSP.play(mCrashID, 1, 1, 0, 0, 1);
                 break;
+            case 2:
+                mSP.play(mJumpID, 1,1,0,0,1);
         }
     }
 }

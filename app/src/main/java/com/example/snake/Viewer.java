@@ -20,17 +20,18 @@ public class Viewer extends SurfaceView implements Subject{
     private Paint mPaint;
     private MotionEvent motionEvent;
 
+
     Viewer(Context context)
     {
         super(context);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
     }
-    public void updateViewer(int mScore,Snake mSnake,Apple mApple)
+    public void updateViewer(int mScore,Snake mSnake,Apple mApple,List<PowerUps> powerUpsList)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
-            System.out.println("Valid");
+            //System.out.println("Valid");
 
 
             // Fill the screen with a color
@@ -47,7 +48,8 @@ public class Viewer extends SurfaceView implements Subject{
 
             mApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
-
+            for(PowerUps power : powerUpsList)
+                power.draw(mCanvas, mPaint);
             // Draw some text while paused
                 if (mPaused) {
 
