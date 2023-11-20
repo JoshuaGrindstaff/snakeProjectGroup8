@@ -9,7 +9,7 @@ import android.graphics.Point;
 
 import java.util.Random;
 
-class Apple {
+class Apple implements Collidable{
 
     // The location of the apple on the grid
     // Not in pixels
@@ -50,7 +50,7 @@ class Apple {
 
     // Let SnakeGame know where the apple is
     // SnakeGame can share this with the snake
-    Point getLocation(){
+    public Point getLocation(){
         return location;
     }
 
