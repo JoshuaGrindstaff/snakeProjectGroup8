@@ -188,23 +188,26 @@ class Snake {
         }
         return dead;
     }
-
-    boolean checkDinner(Point l) {
+    public void makeLonger()
+    {
+        segmentLocations.add(new Point(-10, -10));
+    }
+    boolean checkCollision(Collidable object) {
         //if (snakeXs[0] == l.x && snakeYs[0] == l.y) {
-        if (segmentLocations.get(0).x == l.x &&
-                segmentLocations.get(0).y == l.y) {
+        if (segmentLocations.get(0).x == object.getLocation().x &&
+                segmentLocations.get(0).y == object.getLocation().y) {
 
             // Add a new Point to the list
             // located off-screen.
             // This is OK because on the next call to
             // move it will take the position of
             // the segment in front of it
-            segmentLocations.add(new Point(-10, -10));
+            if(object instanceof Apple )
+                makeLonger();
             return true;
         }
         return false;
     }
-
     void draw(Canvas canvas, Paint paint) {
 
         // Don't run this code if ArrayList has nothing in it
