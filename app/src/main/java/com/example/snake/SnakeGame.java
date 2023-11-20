@@ -2,13 +2,17 @@ package com.example.snake;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.media.SoundPool;
 import android.view.MotionEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 class SnakeGame implements Runnable, OnTouch {
 
     //Branch Test
     // Objects for the game loop/thread
+    private final int MAX_NUMBER_OF_POWERUPS = 2;
     private Thread mThread = null;
     // Control pausing between updates
     private long mNextFrameTime;
@@ -17,20 +21,19 @@ class SnakeGame implements Runnable, OnTouch {
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 40;
     private int mNumBlocksHigh;
-
     // How many points does the player have
     private int mScore;
-
-    // Objects for drawing
-
-
     // A snake ssss
     private Snake mSnake;
     // And an apple
     private Apple mApple;
-
    private Audio sGS;
    private Viewer view;
+   private List<PowerUps> powerList = new ArrayList<>();
+   private int powerNumber;
+   private Random random = new Random();
+   private boolean jump = false;
+
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size,Viewer view) {
@@ -42,16 +45,13 @@ class SnakeGame implements Runnable, OnTouch {
         sGS = new Audio(5);
         sGS.load(context);
         // Call the constructors of our two game objects
-        mApple = new Apple(context,
-                new Point(NUM_BLOCKS_WIDE,
-                        mNumBlocksHigh),
-                blockSize);
+        mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
-        mSnake = new Snake(context,
-                new Point(NUM_BLOCKS_WIDE,
-                        mNumBlocksHigh),
-                blockSize);
-
+        mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        for(int i = 0;i < MAX_NUMBER_OF_POWERUPS;i++)
+        {
+            powerList.add(new PowerUps(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize));
+        }
     }
 
 
@@ -82,8 +82,8 @@ class SnakeGame implements Runnable, OnTouch {
                     update();
                 }
             }
-            System.out.println("update time");
-            view.updateViewer(mScore,mSnake,mApple);
+            //System.out.println("update time");
+            view.updateViewer(mScore,mSnake,mApple,powerList);
         }
     }
 
@@ -120,7 +120,7 @@ class SnakeGame implements Runnable, OnTouch {
         mSnake.move();
 
         // Did the head of the snake eat the apple?
-        if(mSnake.checkDinner(mApple.getLocation())){
+        if(mSnake.checkCollision(mApple)){
             // This reminds me of Edge of Tomorrow.
             // One day the apple will be ready!
             mApple.spawn();
@@ -131,40 +131,46 @@ class SnakeGame implements Runnable, OnTouch {
             // Play a sound
             sGS.playSound(0);
         }
+        for(PowerUps power : powerList)
+        {
+           if(mSnake.checkCollision(power))
+           {
+               powerNumber--;
+               power.despawn();
+           }
+
+        }
+        if(powerNumber < MAX_NUMBER_OF_POWERUPS)
+        {
+            for(PowerUps power : powerList)
+            {
+
+                if(!power.getActive() && 3 > random.nextInt(100))
+                {
+                    System.out.println("Spawn Power UP");
+                    power.spawn();
+                    jump = true;
+                }
+            }
+        }
+
 
         // Did the snake die?
         if (mSnake.detectDeath()) {
             // Pause the game ready to start again
-            sGS.playSound(1);
-
-            view.setPaused(true);
+            if(jump == true)
+            {
+                jump = false;
+                sGS.playSound(2);
+            }
+            else
+            {
+                sGS.playSound(1);
+                view.setPaused(true);
+            }
         }
 
     }
-
-
-
-//    public boolean onTouchEvent(MotionEvent motionEvent) {
-//        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-//            case MotionEvent.ACTION_UP:
-//                if (mPaused) {
-//                    mPaused = false;
-//                    newGame();
-//
-//                    // Don't want to process snake direction for this tap
-//                    return true;
-//                }
-//
-//                // Let the Snake class handle the input
-//                mSnake.switchHeading(motionEvent);
-//                break;
-//
-//            default:
-//                break;
-//
-//        }
-//        return true;
-//    }
 
     // Stop the thread
     public void pause() {
