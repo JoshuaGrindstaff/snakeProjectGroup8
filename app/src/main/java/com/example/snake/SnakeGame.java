@@ -140,6 +140,7 @@ class SnakeGame implements Runnable, OnTouch {
         {
            if(mSnake.checkCollision(power))
            {
+               parameters.setSpring();
                powerNumber--;
                power.despawn();
            }
@@ -156,7 +157,7 @@ class SnakeGame implements Runnable, OnTouch {
                 {
                     System.out.println("Spawn Power UP");
                     power.spawn();
-                    parameters.setSpring();
+
                 }
             }
         }
