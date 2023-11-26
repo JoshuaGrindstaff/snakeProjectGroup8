@@ -22,7 +22,6 @@ class SnakeGame implements Runnable, OnTouch {
     private final int NUM_BLOCKS_WIDE = 40;
     private int mNumBlocksHigh;
     // How many points does the player have
-    private int mScore;
     // A snake ssss
     private Snake mSnake;
     // And an apple
@@ -31,8 +30,8 @@ class SnakeGame implements Runnable, OnTouch {
    private Viewer view;
    private List<PowerUps> powerList = new ArrayList<>();
    private int powerNumber;
+   private GameParameters parameters;
    private Random random = new Random();
-   private boolean jump = false;
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -52,6 +51,7 @@ class SnakeGame implements Runnable, OnTouch {
         {
             powerList.add(new PowerUps(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize));
         }
+        parameters = new GameParameters();
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -93,7 +93,7 @@ class SnakeGame implements Runnable, OnTouch {
         mApple.spawn();
 
         // Reset the mScore
-        mScore = 0;
+        parameters.resetScore();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -111,7 +111,7 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(mScore,mSnake,mApple,powerList);
+            view.updateViewer(parameters.getScore(),mSnake,mApple,powerList);
         }
     }
 
@@ -147,6 +147,7 @@ class SnakeGame implements Runnable, OnTouch {
         // Move the snake
         mSnake.move();
 
+        // Collisions with Apple
         // Did the head of the snake eat the apple?
         if(mSnake.checkCollision(mApple)){
             // This reminds me of Edge of Tomorrow.
@@ -154,11 +155,15 @@ class SnakeGame implements Runnable, OnTouch {
             mApple.spawn();
 
             // Add to  mScore
-            mScore = mScore + 1;
+            parameters.addScore(1);
+            // Add length to snake
 
+            mSnake.makeLonger();
             // Play a sound
             sGS.playSound(0);
         }
+
+        //Collisions with powerups
         for(PowerUps power : powerList)
         {
            if(mSnake.checkCollision(power))
@@ -168,6 +173,8 @@ class SnakeGame implements Runnable, OnTouch {
            }
 
         }
+
+        //Spawn Power Ups
         if(powerNumber < MAX_NUMBER_OF_POWERUPS)
         {
             for(PowerUps power : powerList)
@@ -177,7 +184,7 @@ class SnakeGame implements Runnable, OnTouch {
                 {
                     System.out.println("Spawn Power UP");
                     power.spawn();
-                    jump = true;
+                    parameters.setSpring();
                 }
             }
         }
@@ -186,9 +193,9 @@ class SnakeGame implements Runnable, OnTouch {
         // Did the snake die?
         if (mSnake.detectDeath()) {
             // Pause the game ready to start again
-            if(jump == true)
+            if(parameters.getSpring())
             {
-                jump = false;
+                parameters.resetSpring();
                 sGS.playSound(2);
             }
             else
