@@ -25,33 +25,37 @@ class SnakeGame implements Runnable, OnTouch {
     // A snake ssss
     private Snake mSnake;
     // And an apple
-    private Apple mApple;
+    Apple mApple;
    private Audio sGS;
    private Viewer view;
    private List<PowerUps> powerList = new ArrayList<>();
    private int powerNumber;
-   private GameParameters parameters;
+   GameParameters parameters;
+   private Context context;
    private Random random = new Random();
+   private Collide collide;
+
+   private int blockSize;
 
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size,Viewer view) {
+        System.out.println("building snake game");
         // Work out how many pixels each block is
-        int blockSize = size.x / NUM_BLOCKS_WIDE;
+        blockSize = size.x / NUM_BLOCKS_WIDE;
         // How many blocks of the same size will fit into the height
         mNumBlocksHigh = size.y / blockSize;
         this.view = view;
         sGS = new Audio(5);
         sGS.load(context);
+        this.context = context;
         // Call the constructors of our two game objects
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-        for(int i = 0;i < MAX_NUMBER_OF_POWERUPS;i++)
-        {
-            powerList.add(new PowerUps(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize));
-        }
+
         parameters = new GameParameters();
+        collide = new Collide(parameters,mSnake,sGS);
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -164,30 +168,26 @@ class SnakeGame implements Runnable, OnTouch {
         }
 
         //Collisions with powerups
-        for(PowerUps power : powerList)
+        for(int i = 0; i < powerList.size();i++)
         {
-           if(mSnake.checkCollision(power))
+           if(mSnake.checkCollision(powerList.get(i)))
            {
                parameters.setSpring();
                powerNumber--;
-               power.despawn();
+               powerList.get(i).despawn();
+               powerList.remove(i);
            }
 
         }
 
         //Spawn Power Ups
-        if(powerNumber < MAX_NUMBER_OF_POWERUPS)
+        if(powerList.size() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
-            for(PowerUps power : powerList)
-            {
+            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            powerList.add(spring);
+            System.out.println("Loading Spring");
+            spring.spawn();
 
-                if(!power.getActive() && 3 > random.nextInt(100))
-                {
-                    System.out.println("Spawn Power UP");
-                    power.spawn();
-
-                }
-            }
         }
 
 
