@@ -188,6 +188,11 @@ class Snake {
         }
         return dead;
     }
+    // Add a new Point to the list
+    // located off-screen.
+    // This is OK because on the next call to
+    // move it will take the position of
+    // the segment in front of it
     public void makeLonger()
     {
         segmentLocations.add(new Point(-10, -10));
@@ -197,13 +202,7 @@ class Snake {
         if (segmentLocations.get(0).x == object.getLocation().x &&
                 segmentLocations.get(0).y == object.getLocation().y) {
 
-            // Add a new Point to the list
-            // located off-screen.
-            // This is OK because on the next call to
-            // move it will take the position of
-            // the segment in front of it
-            if(object instanceof Apple )
-                makeLonger();
+
             return true;
         }
         return false;
