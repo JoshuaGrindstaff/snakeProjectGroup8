@@ -53,7 +53,35 @@ class SnakeGame implements Runnable, OnTouch {
             powerList.add(new PowerUps(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize));
         }
     }
-
+//*Tiaera: public class SnakeGame {
+//    private List<HighScore> highScores;
+//    private static final int MAX_HIGH_SCORES = 10; // Adjust as needed
+//
+//    // ...
+//
+//    private void checkHighScore() {
+//        HighScore currentScore = new HighScore(playerName, mScore);
+//        highScores.add(currentScore);
+//        Collections.sort(highScores);
+//
+//        // Keep only the top MAX_HIGH_SCORES scores
+//        if (highScores.size() > MAX_HIGH_SCORES) {
+//            highScores = highScores.subList(0, MAX_HIGH_SCORES);
+//        }
+//
+//        // Save high scores to SharedPreferences or a file
+//        saveHighScores();
+//    }
+//
+//    private void saveHighScores() {
+//        // Implement saving high scores to SharedPreferences or a file
+//    }
+//
+//    public List<HighScore> getHighScores() {
+//        // Return the high scores list
+//        return highScores;
+//    }
+//}
 
     // Called to start a new game
     public void newGame() {
@@ -115,7 +143,7 @@ class SnakeGame implements Runnable, OnTouch {
 
     // Update all the game objects
     public void update() {
-
+//*Tiaera: if (!mPaused) {
         // Move the snake
         mSnake.move();
 
@@ -171,7 +199,34 @@ class SnakeGame implements Runnable, OnTouch {
         }
 
     }
+//*Tiaera: } else {
+//        // Handle touch events when the game is paused (game over screen)
+//        view.update(motionEvent);
+//    }
+//}
 
+
+    //    public boolean onTouchEvent(MotionEvent motionEvent) {
+//        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+//            case MotionEvent.ACTION_UP:
+//                if (mPaused) {
+//                    mPaused = false;
+//                    newGame();
+//
+//                    // Don't want to process snake direction for this tap
+//                    return true;
+//                }
+//
+//                // Let the Snake class handle the input
+//                mSnake.switchHeading(motionEvent);
+//                break;
+//
+//            default:
+//                break;
+//
+//        }
+//        return true;
+//    }
     // Stop the thread
     public void pause() {
         mPlaying = false;
@@ -212,3 +267,47 @@ class SnakeGame implements Runnable, OnTouch {
         }
     }
 }
+//*Tiaera: private void saveHighScores() {
+//    // Use SharedPreferences for simplicity (you can use a file or a database for more complex scenarios)
+//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
+//    SharedPreferences.Editor editor = preferences.edit();
+//
+//    // Convert the list of HighScore objects to a JSON string
+//    Gson gson = new Gson();
+//    String json = gson.toJson(highScores);
+//
+//    // Save the JSON string
+//    editor.putString("highScores", json);
+//    editor.apply();
+//}
+//
+//private void loadHighScores() {
+//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
+//    String json = preferences.getString("highScores", "");
+//
+//    // Convert the JSON string back to a list of HighScore objects
+//    Gson gson = new Gson();
+//    Type type = new TypeToken<List<HighScore>>(){}.getType();
+//    highScores = gson.fromJson(json, type);
+//
+//    if (highScores == null) {
+//        highScores = new ArrayList<>();
+//    }
+//}
+//public class HighScoresActivity extends AppCompatActivity {
+//    // ...
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_high_scores);
+//
+//        // Retrieve high scores from SnakeGame
+//        SnakeGame snakeGame = new SnakeGame(getApplicationContext());
+//        List<HighScore> highScores = snakeGame.getHighScores();
+//
+//        // Display high scores in a ListView or RecyclerView
+//        // You may need to implement a custom adapter for better control over the layout
+//        // ...
+//    }
+//}
