@@ -1,6 +1,5 @@
 package com.example.snake;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,17 +8,16 @@ import android.graphics.Point;
 import java.util.Random;
 
 public abstract class PowerUps implements Collidable {
-    //Constant variable for number of powerups on screen before no more can spawn
+    //Constant variable for number of powers on screen before no more can spawn
     //location for this power up
-    private Point location = new Point();
-    private Point mSpawnRange;
-    private int mSize;
+    private final Point location = new Point();
+    private final Point mSpawnRange;
+    private final int mSize;
     private Bitmap mBitmapPowerUp;
-    private Random random;
-    private Context context;
-    public PowerUps(Context context, Point sr, int s)
+    private final Random random;
+    public PowerUps(Point sr, int s)
     {
-        this.context = context;
+
         mSpawnRange = sr;
         mSize = s;
         location.x = -11;
