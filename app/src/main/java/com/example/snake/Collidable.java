@@ -5,4 +5,5 @@ import android.graphics.Point;
 public interface Collidable {
 
     Point getLocation();
+    void spawn();
 }

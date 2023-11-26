@@ -41,7 +41,7 @@ class Apple implements Collidable{
     }
 
     // This is called every time an apple is eaten
-    void spawn(){
+    public void spawn(){
         // Choose two random values and place the apple
         Random random = new Random();
         location.x = random.nextInt(mSpawnRange.x) + 1;
