@@ -25,17 +25,15 @@ class SnakeGame implements Runnable, OnTouch {
     // A snake ssss
     private Snake mSnake;
     // And an apple
-    Apple mApple;
+   private Apple mApple;
    private Audio sGS;
    private Viewer view;
-   private List<PowerUps> powerList = new ArrayList<>();
-   private int powerNumber;
-   GameParameters parameters;
    private Context context;
    private Random random = new Random();
    private Collide collide;
-
    private int blockSize;
+    private GameParameters parameters;
+   private GameObjectLists objects;
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -49,13 +47,16 @@ class SnakeGame implements Runnable, OnTouch {
         sGS = new Audio(5);
         sGS.load(context);
         this.context = context;
+        objects = new GameObjectLists();
         // Call the constructors of our two game objects
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        //Added to list of collidable objects
+        objects.addCollidableObject(mApple);
 
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
         parameters = new GameParameters();
-        collide = new Collide(parameters,mSnake,sGS);
+        collide = new Collide(parameters,mSnake,sGS,objects);
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -115,7 +116,7 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters.getScore(),mSnake,mApple,powerList);
+            view.updateViewer(parameters.getScore(),mSnake,mApple,objects);
         }
     }
 
@@ -148,10 +149,33 @@ class SnakeGame implements Runnable, OnTouch {
     // Update all the game objects
     public void update() {
 //*Tiaera: if (!mPaused) {
+        //Spawn Power Ups
+        if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
+        {
+            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            objects.addPowerList(spring);
+            objects.addCollidableObject(spring);
+            System.out.println("Loading Spring");
+            spring.spawn();
+        }
         // Move the snake
-        mSnake.move();
 
-        // Collisions with Apple
+        mSnake.move();
+        // Does the Snake Collide into anything that is collidable
+
+        for(Collidable collidable : objects.getCollidableObjects())
+        {
+            if(mSnake.checkCollision(collidable))
+            {
+                collide.collide(collidable);
+            }
+
+        }
+        System.out.println("" + objects.getCollidableObjectsSize());
+        objects.removeCollidableObject();
+
+
+        /*// Collisions with Apple
         // Did the head of the snake eat the apple?
         if(mSnake.checkCollision(mApple)){
             // This reminds me of Edge of Tomorrow.
@@ -173,22 +197,13 @@ class SnakeGame implements Runnable, OnTouch {
            if(mSnake.checkCollision(powerList.get(i)))
            {
                parameters.setSpring();
-               powerNumber--;
                powerList.get(i).despawn();
                powerList.remove(i);
            }
 
         }
 
-        //Spawn Power Ups
-        if(powerList.size() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
-        {
-            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            powerList.add(spring);
-            System.out.println("Loading Spring");
-            spring.spawn();
-
-        }
+        }*/
 
 
         // Did the snake die?
