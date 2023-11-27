@@ -39,7 +39,6 @@ class Apple implements Collidable{
         // Resize the bitmap
         mBitmapApple = Bitmap.createScaledBitmap(mBitmapApple, s, s, false);
     }
-
     // This is called every time an apple is eaten
     public void spawn(){
         // Choose two random values and place the apple
