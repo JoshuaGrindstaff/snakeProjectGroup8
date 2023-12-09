@@ -3,6 +3,7 @@ package com.example.snake;
 public class GameParameters {
     private int score;
     private boolean spring;
+    private boolean gameOver;
     public GameParameters()
     {
         score = 0;
@@ -14,4 +15,6 @@ public class GameParameters {
     public void resetSpring(){spring = false;}
     public boolean getSpring(){return spring;}
     public int getScore(){return score;}
+    public boolean getGameOver(){return gameOver;}
+    public void setDeath(boolean dead){gameOver = dead;}
 }

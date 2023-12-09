@@ -25,15 +25,18 @@ public class Collide {
                 snake.makeLonger();
                 // Play a sound
                 sGS.playSound(0);
+                return;
         }
+
         if(collidable instanceof PowerUps)
         {
             ((PowerUps) collidable).despawn();
             objects.setToRemove(collidable);
             objects.removePowerList((PowerUps) collidable);
-            if(collidable instanceof Spring)
+            if(((PowerUps) collidable).getType() == "Spring")
             {
                 parameters.setSpring();
+                return;
             }
         }
     }

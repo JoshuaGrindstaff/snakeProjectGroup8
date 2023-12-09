@@ -1,4 +1,4 @@
-package com.example.snake;
+/*package com.example.snake;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,5 +15,5 @@ public class Spring extends PowerUps {
         //sets Bitmap to be the bit map for spring
         super.setBitmap(mBitmapSpring);
     }
-}
+}*/
 

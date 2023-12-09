@@ -27,27 +27,28 @@ public class Viewer extends SurfaceView implements Subject{
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
     }
-    //*Tiaera: private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
-    //    // Draw the game over screen
-    //    canvas.drawColor(Color.argb(255, 26, 128, 182));
-    //
-    //    // Set the size and color of the paint for the text
-    //    paint.setColor(Color.argb(255, 255, 255, 255));
-    //    paint.setTextSize(120);
-    //
-    //    // Draw the final score
-    //    canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
-    //
-    //    // Set the size and color of the paint for the options
-    //    paint.setTextSize(80);
-    //
-    //    // Draw the restart option
-    //    canvas.drawText("Restart", 200, 400, paint);
-    //
-    //    // Draw the return to start screen option
-    //    canvas.drawText("Return to Start", 200, 600, paint);
-    //}
-    public void updateViewer(int mScore,Snake mSnake,Apple mApple,GameObjectLists objects)
+    //Tiaera:
+    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
+        // Draw the game over screen
+        canvas.drawColor(Color.argb(255, 26, 128, 182));
+
+        // Set the size and color of the paint for the text
+        paint.setColor(Color.argb(255, 255, 255, 255));
+        paint.setTextSize(120);
+
+        // Draw the final score
+        canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
+
+        // Set the size and color of the paint for the options
+        paint.setTextSize(80);
+
+        // Draw the restart option
+        canvas.drawText("Restart", 200, 400, paint);
+
+        // Draw the return to start screen option
+        canvas.drawText("Return to Start", 200, 600, paint);
+    }
+    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,GameObjectLists objects)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
@@ -64,7 +65,7 @@ public class Viewer extends SurfaceView implements Subject{
 
 
             // Draw the score
-            mCanvas.drawText("" + mScore, 20, 120, mPaint);
+            mCanvas.drawText("" + parameters.getScore(), 20, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
@@ -85,6 +86,9 @@ public class Viewer extends SurfaceView implements Subject{
                 // We will give this an international upgrade soon
                 mCanvas.drawText("TEST!", 200, 700, mPaint);
 
+                }
+                if (parameters.getGameOver()){
+                    drawGameOverScreen(mCanvas,mPaint, parameters.getScore());
                 }
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
 

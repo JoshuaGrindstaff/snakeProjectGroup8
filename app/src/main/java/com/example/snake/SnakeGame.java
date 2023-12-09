@@ -116,7 +116,7 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters.getScore(),mSnake,mApple,objects);
+            view.updateViewer(parameters,mSnake,mApple,objects);
         }
     }
 
@@ -152,11 +152,12 @@ class SnakeGame implements Runnable, OnTouch {
         //Spawn Power Ups
         if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
-            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            objects.addPowerList(spring);
-            objects.addCollidableObject(spring);
-            System.out.println("Loading Spring");
-            spring.spawn();
+            //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,"Spring",context);
+            objects.addPowerList(power);
+            objects.addCollidableObject(power);
+            //System.out.println("Loading Spring");
+            power.spawn();
         }
         // Move the snake
 
@@ -175,37 +176,6 @@ class SnakeGame implements Runnable, OnTouch {
         objects.removeCollidableObject();
 
 
-        /*// Collisions with Apple
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkCollision(mApple)){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
-            mApple.spawn();
-
-            // Add to  mScore
-            parameters.addScore(1);
-            // Add length to snake
-
-            mSnake.makeLonger();
-            // Play a sound
-            sGS.playSound(0);
-        }
-
-        //Collisions with powerups
-        for(int i = 0; i < powerList.size();i++)
-        {
-           if(mSnake.checkCollision(powerList.get(i)))
-           {
-               parameters.setSpring();
-               powerList.get(i).despawn();
-               powerList.remove(i);
-           }
-
-        }
-
-        }*/
-
-
         // Did the snake die?
         if (mSnake.detectDeath()) {
             // Pause the game ready to start again
@@ -218,6 +188,7 @@ class SnakeGame implements Runnable, OnTouch {
             {
                 sGS.playSound(1);
                 view.setPaused(true);
+                parameters.setDeath(true);
             }
         }
 
