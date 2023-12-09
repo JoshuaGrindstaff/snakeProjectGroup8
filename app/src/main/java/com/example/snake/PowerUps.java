@@ -18,27 +18,36 @@ public class PowerUps implements Collidable {
     private Bitmap mBitmapPowerUp;
     private final Random random;
     private final String type;
-    public PowerUps(Point sr, int s, String type, Context context)
+    public PowerUps(Point sr, int s, Context context)
     {
 
         mSpawnRange = sr;
         mSize = s;
         location.x = -11;
-        this.type = type;
+
         random = new Random();
-        switch(type)
+        switch(random.nextInt(2))
         {
-            case "Spring":
+            case 0:
                 //Load image into bitmap
                 Bitmap mBitmapSpring = BitmapFactory.decodeResource(context.getResources(), R.drawable.spring);
                 //sets Bitmap to be the bit map for spring
                 mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapSpring,mSize,mSize,false);
+                type = "Spring";
+                break;
+            case 1:
+                //Load image into bitmap
+                Bitmap mBitmapLight = BitmapFactory.decodeResource(context.getResources(), R.drawable.lightning);
+                //sets Bitmap to be the bit map for Lightning
+                mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapLight,mSize,mSize,false);
+                type = "Lightning";
                 break;
             default:
                 //Load image into bitmap
                 Bitmap mBitmapDefault = BitmapFactory.decodeResource(context.getResources(), R.drawable.defaultpickup);
                 //sets Bitmap to be the bit map default
                 mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapDefault,mSize,mSize,false);
+                type = "Default";
         }
 
     }
