@@ -97,8 +97,8 @@ class SnakeGame implements Runnable, OnTouch {
         // Get the apple ready for dinner
         mApple.spawn();
 
-        // Reset the mScore
-        parameters.resetScore();
+        // Calls resetDeath in Parameters
+        parameters.resetDeath();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -177,7 +177,7 @@ class SnakeGame implements Runnable, OnTouch {
 
 
         // Did the snake die?
-        if (mSnake.detectDeath()) {
+        if (mSnake.detectSelf()) {
             // Pause the game ready to start again
             if(parameters.getSpring())
             {
@@ -188,8 +188,14 @@ class SnakeGame implements Runnable, OnTouch {
             {
                 sGS.playSound(1);
                 view.setPaused(true);
-                parameters.setDeath(true);
+                parameters.setDeath();
             }
+        }
+        if(mSnake.detectEdge())
+        {
+            sGS.playSound(1);
+            view.setPaused(true);
+            parameters.setDeath();
         }
 
     }
