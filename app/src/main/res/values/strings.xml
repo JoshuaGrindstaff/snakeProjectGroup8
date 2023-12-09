@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Snake</string>
+<!--    added below-->
+    <string name="pause_resume_button">Pause/Resume</string>
 </resources>
