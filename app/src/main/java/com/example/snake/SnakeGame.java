@@ -100,9 +100,15 @@ class SnakeGame implements Runnable, OnTouch {
 
         // Get the apple ready for dinner
         mApple.spawn();
+
+
+        // Calls resetDeath in Parameters
+        parameters.resetDeath();
+
         mBadApple.spawn();
         // Reset the mScore
         parameters.resetScore();
+
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -120,7 +126,9 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters.getScore(),mSnake,mApple,mBadApple,objects);
+
+            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects);
+
         }
     }
 
@@ -138,8 +146,8 @@ class SnakeGame implements Runnable, OnTouch {
             // Tenth of a second has passed
 
             // Setup when the next update will be triggered
-            mNextFrameTime =System.currentTimeMillis()
-                    + MILLIS_PER_SECOND / TARGET_FPS;
+            mNextFrameTime = (long) (System.currentTimeMillis()
+                                + MILLIS_PER_SECOND / (TARGET_FPS * parameters.getSpMult()));
 
             // Return true so that the update and draw
             // methods are executed
@@ -156,11 +164,12 @@ class SnakeGame implements Runnable, OnTouch {
         //Spawn Power Ups
         if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
-            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            objects.addPowerList(spring);
-            objects.addCollidableObject(spring);
-            System.out.println("Loading Spring");
-            spring.spawn();
+            //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,context);
+            objects.addPowerList(power);
+            objects.addCollidableObject(power);
+            //System.out.println("Loading Spring");
+            power.spawn();
         }
         // Move the snake
 
@@ -179,39 +188,8 @@ class SnakeGame implements Runnable, OnTouch {
         objects.removeCollidableObject();
 
 
-        /*// Collisions with Apple
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkCollision(mApple)){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
-            mApple.spawn();
-
-            // Add to  mScore
-            parameters.addScore(1);
-            // Add length to snake
-
-            mSnake.makeLonger();
-            // Play a sound
-            sGS.playSound(0);
-        }
-
-        //Collisions with powerups
-        for(int i = 0; i < powerList.size();i++)
-        {
-           if(mSnake.checkCollision(powerList.get(i)))
-           {
-               parameters.setSpring();
-               powerList.get(i).despawn();
-               powerList.remove(i);
-           }
-
-        }
-
-        }*/
-
-
         // Did the snake die?
-        if (mSnake.detectDeath()) {
+        if (mSnake.detectSelf()) {
             // Pause the game ready to start again
             if(parameters.getSpring())
             {
@@ -222,9 +200,16 @@ class SnakeGame implements Runnable, OnTouch {
             {
                 sGS.playSound(1);
                 view.setPaused(true);
+                parameters.setDeath();
             }
         }
-
+        if(mSnake.detectEdge())
+        {
+            sGS.playSound(1);
+            view.setPaused(true);
+            parameters.setDeath();
+        }
+        parameters.updateSpMult();
     }
 //*Tiaera: } else {
 //        // Handle touch events when the game is paused (game over screen)
@@ -285,7 +270,23 @@ class SnakeGame implements Runnable, OnTouch {
 
                 }
 
-                // Let the Snake class handle the input
+                      /*  float x = motionEvent.getX();
+                        float y = motionEvent.getY();
+
+                        // Check if the touch is within the restart option
+                        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
+                            // Restart the game
+                            view.setPaused(false);
+                            newGame()
+                        }
+
+                        // Check if the touch is within the return to start screen option
+                        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
+                            // Handle returning to the start screen (implement as needed)
+                            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
+                        }
+                    } else {*/
+                 //Let the Snake class handle the input
                 mSnake.switchHeading(motionEvent);
                 break;
 

@@ -25,7 +25,9 @@ public class Collide {
                 snake.makeLonger();
                 // Play a sound
                 sGS.playSound(0);
+                return;
         }
+
         if(collidable instanceof BadApple)
         {
             collidable.spawn();
@@ -38,9 +40,14 @@ public class Collide {
             ((PowerUps) collidable).despawn();
             objects.setToRemove(collidable);
             objects.removePowerList((PowerUps) collidable);
-            if(collidable instanceof Spring)
-            {
-                parameters.setSpring();
+            switch(((PowerUps) collidable).getType()) {
+                case "Spring":
+                    parameters.setSpring();
+                    return;
+                case "Lightning":
+                    parameters.addSpMult();
+                default:
+                    System.out.println("No PowerUps of Such Type");
             }
         }
     }

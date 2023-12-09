@@ -1,13 +1,15 @@
 package com.example.snake;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 
 import java.util.Random;
 
-public abstract class PowerUps implements Collidable {
+public class PowerUps implements Collidable {
     //Constant variable for number of powers on screen before no more can spawn
     //location for this power up
     private final Point location = new Point();
@@ -15,7 +17,8 @@ public abstract class PowerUps implements Collidable {
     private final int mSize;
     private Bitmap mBitmapPowerUp;
     private final Random random;
-    public PowerUps(Point sr, int s)
+    private final String type;
+    public PowerUps(Point sr, int s, Context context)
     {
 
         mSpawnRange = sr;
@@ -23,6 +26,30 @@ public abstract class PowerUps implements Collidable {
         location.x = -11;
 
         random = new Random();
+        switch(random.nextInt(2))
+        {
+            case 0:
+                //Load image into bitmap
+                Bitmap mBitmapSpring = BitmapFactory.decodeResource(context.getResources(), R.drawable.spring);
+                //sets Bitmap to be the bit map for spring
+                mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapSpring,mSize,mSize,false);
+                type = "Spring";
+                break;
+            case 1:
+                //Load image into bitmap
+                Bitmap mBitmapLight = BitmapFactory.decodeResource(context.getResources(), R.drawable.lightning);
+                //sets Bitmap to be the bit map for Lightning
+                mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapLight,mSize,mSize,false);
+                type = "Lightning";
+                break;
+            default:
+                //Load image into bitmap
+                Bitmap mBitmapDefault = BitmapFactory.decodeResource(context.getResources(), R.drawable.defaultpickup);
+                //sets Bitmap to be the bit map default
+                mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapDefault,mSize,mSize,false);
+                type = "Default";
+        }
+
     }
     public void spawn(){
         // Choose two random values and place the power up
@@ -41,12 +68,13 @@ public abstract class PowerUps implements Collidable {
     {
         return location;
     }
-    protected void setBitmap(Bitmap mBitmapChild)
+    public String getType(){return type;}
+/*    protected void setBitmap(Bitmap mBitmapChild)
     {
 
         mBitmapPowerUp = mBitmapChild;
         mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapPowerUp,mSize,mSize,false);
-    }
+    }*/
     //abstract void draw(Canvas canvas, Paint paint);
     void draw(Canvas canvas, Paint paint){
         if(mBitmapPowerUp != null)
