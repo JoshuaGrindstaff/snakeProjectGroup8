@@ -63,6 +63,7 @@ public class Audio
                 break;
             case 2:
                 mSP.play(mJumpID, 1,1,0,0,1);
+
         }
     }
 }
