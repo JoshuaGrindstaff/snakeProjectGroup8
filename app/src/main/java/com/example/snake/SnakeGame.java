@@ -134,8 +134,8 @@ class SnakeGame implements Runnable, OnTouch {
             // Tenth of a second has passed
 
             // Setup when the next update will be triggered
-            mNextFrameTime =System.currentTimeMillis()
-                    + MILLIS_PER_SECOND / TARGET_FPS;
+            mNextFrameTime = (long) (System.currentTimeMillis()
+                                + MILLIS_PER_SECOND / (TARGET_FPS * parameters.getSpMult()));
 
             // Return true so that the update and draw
             // methods are executed
@@ -153,7 +153,7 @@ class SnakeGame implements Runnable, OnTouch {
         if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
             //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,"Spring",context);
+            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,context);
             objects.addPowerList(power);
             objects.addCollidableObject(power);
             //System.out.println("Loading Spring");
@@ -197,7 +197,7 @@ class SnakeGame implements Runnable, OnTouch {
             view.setPaused(true);
             parameters.setDeath();
         }
-
+        parameters.updateSpMult();
     }
 //*Tiaera: } else {
 //        // Handle touch events when the game is paused (game over screen)
@@ -258,7 +258,23 @@ class SnakeGame implements Runnable, OnTouch {
 
                 }
 
-                // Let the Snake class handle the input
+                      /*  float x = motionEvent.getX();
+                        float y = motionEvent.getY();
+
+                        // Check if the touch is within the restart option
+                        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
+                            // Restart the game
+                            view.setPaused(false);
+                            newGame()
+                        }
+
+                        // Check if the touch is within the return to start screen option
+                        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
+                            // Handle returning to the start screen (implement as needed)
+                            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
+                        }
+                    } else {*/
+                 //Let the Snake class handle the input
                 mSnake.switchHeading(motionEvent);
                 break;
 

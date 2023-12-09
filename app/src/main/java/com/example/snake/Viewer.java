@@ -97,23 +97,7 @@ public class Viewer extends SurfaceView implements Subject{
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         this.motionEvent = motionEvent;
-        //Tiaera: if (mPaused) {
-        //        float x = motionEvent.getX();
-        //        float y = motionEvent.getY();
-        //
-        //        // Check if the touch is within the restart option
-        //        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
-        //            // Restart the game
-        //            setPaused(false);
-        //            notifyObservers(); // Notify SnakeGame to restart
-        //        }
-        //
-        //        // Check if the touch is within the return to start screen option
-        //        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
-        //            // Handle returning to the start screen (implement as needed)
-        //            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
-        //        }
-        //    } else {
+
         notifyObservers();
         return true;
     }

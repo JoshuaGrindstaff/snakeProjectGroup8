@@ -33,10 +33,14 @@ public class Collide {
             ((PowerUps) collidable).despawn();
             objects.setToRemove(collidable);
             objects.removePowerList((PowerUps) collidable);
-            if(((PowerUps) collidable).getType() == "Spring")
-            {
-                parameters.setSpring();
-                return;
+            switch(((PowerUps) collidable).getType()) {
+                case "Spring":
+                    parameters.setSpring();
+                    return;
+                case "Lightning":
+                    parameters.addSpMult();
+                default:
+                    System.out.println("No PowerUps of Such Type");
             }
         }
     }
