@@ -2616,6 +2616,7 @@ drawable abc_vector_test
 drawable apple
 drawable avd_hide_password
 drawable avd_show_password
+drawable bad_apple
 drawable body
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
@@ -2625,6 +2626,7 @@ drawable btn_radio_off_mtrl
 drawable btn_radio_off_to_on_mtrl_animation
 drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
+drawable defaultpickup
 drawable design_fab_background
 drawable design_ic_visibility
 drawable design_ic_visibility_off
@@ -3014,6 +3016,7 @@ id parent_matrix
 id password_toggle
 id path
 id pathRelative
+id pauseButton
 id peekHeight
 id percent
 id pin
@@ -3270,6 +3273,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activitysnake
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -3498,6 +3502,7 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string pause_resume_button
 string search_menu_title
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description

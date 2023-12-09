@@ -47,7 +47,7 @@ public class Viewer extends SurfaceView implements Subject{
     //    // Draw the return to start screen option
     //    canvas.drawText("Return to Start", 200, 600, paint);
     //}
-    public void updateViewer(int mScore,Snake mSnake,Apple mApple,GameObjectLists objects)
+    public void updateViewer(int mScore,Snake mSnake,Apple mApple, BadApple mBadApple, GameObjectLists objects)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
@@ -67,6 +67,7 @@ public class Viewer extends SurfaceView implements Subject{
             mCanvas.drawText("" + mScore, 20, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
+            mBadApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
             for(PowerUps power : objects.getPowerList())
                 power.draw(mCanvas, mPaint);
