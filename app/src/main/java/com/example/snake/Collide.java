@@ -28,6 +28,13 @@ public class Collide {
                 return;
         }
 
+        if(collidable instanceof BadApple)
+        {
+            collidable.spawn();
+            parameters.addScore(-1);
+            sGS.playSound(1);
+        }
+
         if(collidable instanceof PowerUps)
         {
             ((PowerUps) collidable).despawn();

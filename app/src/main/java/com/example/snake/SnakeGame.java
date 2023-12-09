@@ -26,6 +26,7 @@ class SnakeGame implements Runnable, OnTouch {
     private Snake mSnake;
     // And an apple
    private Apple mApple;
+   private BadApple mBadApple;
    private Audio sGS;
    private Viewer view;
    private Context context;
@@ -52,6 +53,9 @@ class SnakeGame implements Runnable, OnTouch {
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         //Added to list of collidable objects
         objects.addCollidableObject(mApple);
+
+        mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        objects.addCollidableObject(mBadApple);
 
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
@@ -97,8 +101,14 @@ class SnakeGame implements Runnable, OnTouch {
         // Get the apple ready for dinner
         mApple.spawn();
 
+
         // Calls resetDeath in Parameters
         parameters.resetDeath();
+
+        mBadApple.spawn();
+        // Reset the mScore
+        parameters.resetScore();
+
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -116,7 +126,9 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters,mSnake,mApple,objects);
+
+            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects);
+
         }
     }
 
