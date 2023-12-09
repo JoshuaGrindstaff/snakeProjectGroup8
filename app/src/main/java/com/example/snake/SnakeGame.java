@@ -25,17 +25,15 @@ class SnakeGame implements Runnable, OnTouch {
     // A snake ssss
     private Snake mSnake;
     // And an apple
-    Apple mApple;
+   private Apple mApple;
    private Audio sGS;
    private Viewer view;
-   private List<PowerUps> powerList = new ArrayList<>();
-   private int powerNumber;
-   GameParameters parameters;
    private Context context;
    private Random random = new Random();
    private Collide collide;
-
    private int blockSize;
+    private GameParameters parameters;
+   private GameObjectLists objects;
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -49,15 +47,46 @@ class SnakeGame implements Runnable, OnTouch {
         sGS = new Audio(5);
         sGS.load(context);
         this.context = context;
+        objects = new GameObjectLists();
         // Call the constructors of our two game objects
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        //Added to list of collidable objects
+        objects.addCollidableObject(mApple);
 
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
         parameters = new GameParameters();
-        collide = new Collide(parameters,mSnake,sGS);
+        collide = new Collide(parameters,mSnake,sGS,objects);
     }
-
+//*Tiaera: public class SnakeGame {
+//    private List<HighScore> highScores;
+//    private static final int MAX_HIGH_SCORES = 10; // Adjust as needed
+//
+//    // ...
+//
+//    private void checkHighScore() {
+//        HighScore currentScore = new HighScore(playerName, mScore);
+//        highScores.add(currentScore);
+//        Collections.sort(highScores);
+//
+//        // Keep only the top MAX_HIGH_SCORES scores
+//        if (highScores.size() > MAX_HIGH_SCORES) {
+//            highScores = highScores.subList(0, MAX_HIGH_SCORES);
+//        }
+//
+//        // Save high scores to SharedPreferences or a file
+//        saveHighScores();
+//    }
+//
+//    private void saveHighScores() {
+//        // Implement saving high scores to SharedPreferences or a file
+//    }
+//
+//    public List<HighScore> getHighScores() {
+//        // Return the high scores list
+//        return highScores;
+//    }
+//}
 
     // Called to start a new game
     public void newGame() {
@@ -68,8 +97,8 @@ class SnakeGame implements Runnable, OnTouch {
         // Get the apple ready for dinner
         mApple.spawn();
 
-        // Reset the mScore
-        parameters.resetScore();
+        // Calls resetDeath in Parameters
+        parameters.resetDeath();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -87,7 +116,7 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters.getScore(),mSnake,mApple,powerList);
+            view.updateViewer(parameters,mSnake,mApple,objects);
         }
     }
 
@@ -119,52 +148,36 @@ class SnakeGame implements Runnable, OnTouch {
 
     // Update all the game objects
     public void update() {
-
-        // Move the snake
-        mSnake.move();
-
-        // Collisions with Apple
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkCollision(mApple)){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
-            mApple.spawn();
-
-            // Add to  mScore
-            parameters.addScore(1);
-            // Add length to snake
-
-            mSnake.makeLonger();
-            // Play a sound
-            sGS.playSound(0);
-        }
-
-        //Collisions with powerups
-        for(int i = 0; i < powerList.size();i++)
-        {
-           if(mSnake.checkCollision(powerList.get(i)))
-           {
-               parameters.setSpring();
-               powerNumber--;
-               powerList.get(i).despawn();
-               powerList.remove(i);
-           }
-
-        }
-
+//*Tiaera: if (!mPaused) {
         //Spawn Power Ups
-        if(powerList.size() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
+        if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
-            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            powerList.add(spring);
-            System.out.println("Loading Spring");
-            spring.spawn();
+            //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,"Spring",context);
+            objects.addPowerList(power);
+            objects.addCollidableObject(power);
+            //System.out.println("Loading Spring");
+            power.spawn();
+        }
+        // Move the snake
+
+        mSnake.move();
+        // Does the Snake Collide into anything that is collidable
+
+        for(Collidable collidable : objects.getCollidableObjects())
+        {
+            if(mSnake.checkCollision(collidable))
+            {
+                collide.collide(collidable);
+            }
 
         }
+        System.out.println("" + objects.getCollidableObjectsSize());
+        objects.removeCollidableObject();
 
 
         // Did the snake die?
-        if (mSnake.detectDeath()) {
+        if (mSnake.detectSelf()) {
             // Pause the game ready to start again
             if(parameters.getSpring())
             {
@@ -175,11 +188,45 @@ class SnakeGame implements Runnable, OnTouch {
             {
                 sGS.playSound(1);
                 view.setPaused(true);
+                parameters.setDeath();
             }
+        }
+        if(mSnake.detectEdge())
+        {
+            sGS.playSound(1);
+            view.setPaused(true);
+            parameters.setDeath();
         }
 
     }
+//*Tiaera: } else {
+//        // Handle touch events when the game is paused (game over screen)
+//        view.update(motionEvent);
+//    }
+//}
 
+
+    //    public boolean onTouchEvent(MotionEvent motionEvent) {
+//        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+//            case MotionEvent.ACTION_UP:
+//                if (mPaused) {
+//                    mPaused = false;
+//                    newGame();
+//
+//                    // Don't want to process snake direction for this tap
+//                    return true;
+//                }
+//
+//                // Let the Snake class handle the input
+//                mSnake.switchHeading(motionEvent);
+//                break;
+//
+//            default:
+//                break;
+//
+//        }
+//        return true;
+//    }
     // Stop the thread
     public void pause() {
         mPlaying = false;
@@ -220,3 +267,47 @@ class SnakeGame implements Runnable, OnTouch {
         }
     }
 }
+//*Tiaera: private void saveHighScores() {
+//    // Use SharedPreferences for simplicity (you can use a file or a database for more complex scenarios)
+//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
+//    SharedPreferences.Editor editor = preferences.edit();
+//
+//    // Convert the list of HighScore objects to a JSON string
+//    Gson gson = new Gson();
+//    String json = gson.toJson(highScores);
+//
+//    // Save the JSON string
+//    editor.putString("highScores", json);
+//    editor.apply();
+//}
+//
+//private void loadHighScores() {
+//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
+//    String json = preferences.getString("highScores", "");
+//
+//    // Convert the JSON string back to a list of HighScore objects
+//    Gson gson = new Gson();
+//    Type type = new TypeToken<List<HighScore>>(){}.getType();
+//    highScores = gson.fromJson(json, type);
+//
+//    if (highScores == null) {
+//        highScores = new ArrayList<>();
+//    }
+//}
+//public class HighScoresActivity extends AppCompatActivity {
+//    // ...
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_high_scores);
+//
+//        // Retrieve high scores from SnakeGame
+//        SnakeGame snakeGame = new SnakeGame(getApplicationContext());
+//        List<HighScore> highScores = snakeGame.getHighScores();
+//
+//        // Display high scores in a ListView or RecyclerView
+//        // You may need to implement a custom adapter for better control over the layout
+//        // ...
+//    }
+//}

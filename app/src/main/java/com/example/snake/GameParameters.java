@@ -16,5 +16,15 @@ public class GameParameters {
     public boolean getSpring(){return spring;}
     public int getScore(){return score;}
     public boolean getGameOver(){return gameOver;}
-    public void setDeath(boolean dead){gameOver = dead;}
+    public void setDeath()
+    {
+        gameOver = true;
+        spring = false;
+    }
+    public void resetDeath()
+    {
+        gameOver = false;
+        score = 0;
+    }
+
 }
