@@ -72,7 +72,7 @@ private Point size;
 //        canvas.drawText("Return to Start", 200, 600, paint);
 
         // Load the image to the bitmap
-        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.apple);
+        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.gameoverscrn);
 
         // Resize the bitmap
         s = 0;
