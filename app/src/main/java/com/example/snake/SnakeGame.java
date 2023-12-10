@@ -1,6 +1,7 @@
 package com.example.snake;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
@@ -36,7 +37,7 @@ class SnakeGame implements Runnable, OnTouch {
    private int blockSize;
     private GameParameters parameters;
    private GameObjectLists objects;
-
+    private SharedPreferences.Editor mEditor;
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size,Viewer view) {
@@ -54,6 +55,10 @@ class SnakeGame implements Runnable, OnTouch {
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         //Added to list of collidable objects
         objects.addCollidableObject(mApple);
+        //Code from TextBook
+        SharedPreferences prefs;
+        prefs = context.getSharedPreferences("HiScore",Context.MODE_PRIVATE);
+        mEditor = prefs.edit();
 
         mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         objects.addCollidableObject(mBadApple);
@@ -62,6 +67,10 @@ class SnakeGame implements Runnable, OnTouch {
 
         parameters = new GameParameters();
         collide = new Collide(parameters,mSnake,sGS,objects);
+        System.out.println(prefs.getInt("hi_score",0));
+        parameters.setHighScore(prefs.getInt("hi_score",0));
+
+
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -287,6 +296,8 @@ class SnakeGame implements Runnable, OnTouch {
                 if (view.getPaused()) {
                     if(parameters.getGameOver())
                     {
+                        mEditor.putInt("hi_score", parameters.getHighScore());
+                        mEditor.commit();
                         parameters.resetDeath();
                         parameters.setShowScore(true);
                     }

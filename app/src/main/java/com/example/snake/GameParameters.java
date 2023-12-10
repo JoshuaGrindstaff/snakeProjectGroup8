@@ -7,6 +7,7 @@ public class GameParameters {
     private double spMult;
     private double baseSpMult;
     private boolean showScore;
+    private int highScore;
     public GameParameters()
     {
         score = 0;
@@ -57,4 +58,15 @@ public class GameParameters {
     public boolean getShowScore() {return showScore;}
     public void setShowScore(boolean s) {showScore = s;}
     public int getMult(){return (int)floor(2*baseSpMult);}
+    public int getHighScore()
+    {
+        if(score > highScore)
+        {
+            highScore = score;
+        }
+        return highScore;
+    }
+
+    public void setHighScore(int m){highScore = m;
+    System.out.println(highScore);}
 }

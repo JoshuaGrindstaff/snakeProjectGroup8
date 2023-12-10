@@ -22,18 +22,18 @@ public class Viewer extends SurfaceView implements Subject{
     private SurfaceHolder mSurfaceHolder;
     private Paint mPaint;
     private MotionEvent motionEvent;
-private Context context;
-private Point size;
+    private Context context;
+    private Point size;
 
     Viewer(Context context, Point size)
     {
         super(context);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
-        this.context =  context;
+        this.context = context;
         this.size = size;
     }
-    private void drawHighScore(Canvas canvas, Paint paint)
+    private void drawHighScore(Canvas canvas, Paint paint,GameParameters parameters)
     {
 // Draw the game over screen
         canvas.drawColor(Color.argb(255, 26, 128, 182));
@@ -48,11 +48,11 @@ private Point size;
         // Draw the restart option
         canvas.drawText("High Score", 50, 100, paint);
 
-        // Draw the return to start screen option
-        canvas.drawText("1st...10", 100, 300, paint);
+        //
+        canvas.drawText(""+parameters.getHighScore(), 100, 300, paint);
     }
-    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore, int s) {
-//        // Draw the game over screen
+    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
+        // Draw the game over screen
 //        //canvas.drawColor(Color.argb(255, 26, 128, 182));
 //
 //        // Set the size and color of the paint for the text
@@ -72,15 +72,13 @@ private Point size;
 //        canvas.drawText("Return to Start", 200, 600, paint);
 
         // Load the image to the bitmap
-        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.apple);
+        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.gameoverscrn);
 
         // Resize the bitmap
-        s = 0;
         mBitmapGameOverScrn = Bitmap.createScaledBitmap((Bitmap) mBitmapGameOverScrn, size.x, size.y, false);
         canvas.drawBitmap((Bitmap) mBitmapGameOverScrn,
-                 s,s, paint);
-   }
-
+                0,0, paint);
+    }
     public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
@@ -124,11 +122,11 @@ private Point size;
 
                 }
                 if (parameters.getGameOver()){
-                    drawGameOverScreen(mCanvas,mPaint, parameters.getScore(),0);
+                    drawGameOverScreen(mCanvas,mPaint, parameters.getScore());
                 }
                 if(parameters.getShowScore())
                 {
-                    drawHighScore(mCanvas,mPaint);
+                    drawHighScore(mCanvas,mPaint,parameters);
                 }
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
 
