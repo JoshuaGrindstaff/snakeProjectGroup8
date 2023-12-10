@@ -17,6 +17,7 @@ class SnakeGame implements Runnable, OnTouch {
     // Control pausing between updates
     private long mNextFrameTime;
     // Is the game currently playing and or paused?
+    private long mNextMoveTime;
     private volatile boolean mPlaying = false;
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 40;
@@ -106,9 +107,6 @@ class SnakeGame implements Runnable, OnTouch {
         parameters.resetDeath();
 
         mBadApple.spawn();
-        // Reset the mScore
-        parameters.resetScore();
-
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -134,10 +132,31 @@ class SnakeGame implements Runnable, OnTouch {
 
 
     // Check to see if it is time for an update
+    public boolean moveRequired()
+    {
+        // Run at 10 frames per second
+        final long TARGET_MPS = 10;
+        // There are 1000 milliseconds in a second
+        final long MILLIS_PER_SECOND = 1000;
+
+        // Are we due to update the frame
+        if(mNextMoveTime <= System.currentTimeMillis()) {
+            // Tenth of a second has passed
+
+            // Setup when the next update will be triggered
+            mNextMoveTime = (long) (System.currentTimeMillis()
+                    + MILLIS_PER_SECOND / (TARGET_MPS * parameters.getSpMult()));
+
+            // Return true so that the update and draw
+            // methods are executed
+            return true;
+        }
+        return false;
+    }
     public boolean updateRequired() {
 
         // Run at 10 frames per second
-        final long TARGET_FPS = 10;
+        final long TARGET_FPS = 60;
         // There are 1000 milliseconds in a second
         final long MILLIS_PER_SECOND = 1000;
 
@@ -147,7 +166,7 @@ class SnakeGame implements Runnable, OnTouch {
 
             // Setup when the next update will be triggered
             mNextFrameTime = (long) (System.currentTimeMillis()
-                                + MILLIS_PER_SECOND / (TARGET_FPS * parameters.getSpMult()));
+                                + MILLIS_PER_SECOND / (TARGET_FPS));
 
             // Return true so that the update and draw
             // methods are executed
@@ -172,43 +191,42 @@ class SnakeGame implements Runnable, OnTouch {
             power.spawn();
         }
         // Move the snake
-
-        mSnake.move();
-        // Does the Snake Collide into anything that is collidable
-
-        for(Collidable collidable : objects.getCollidableObjects())
-        {
-            if(mSnake.checkCollision(collidable))
+        if(moveRequired()) {
+            mSnake.move();
+            for(Collidable collidable : objects.getCollidableObjects())
             {
-                collide.collide(collidable);
+                if(mSnake.checkCollision(collidable))
+                {
+                    collide.collide(collidable);
+                }
+
             }
-
-        }
-        System.out.println("" + objects.getCollidableObjectsSize());
-        objects.removeCollidableObject();
-
-
-        // Did the snake die?
-        if (mSnake.detectSelf()) {
-            // Pause the game ready to start again
-            if(parameters.getSpring())
-            {
-                parameters.resetSpring();
-                sGS.playSound(2);
+            if (mSnake.detectSelf()) {
+                // Pause the game ready to start again
+                if(parameters.getSpring())
+                {
+                    parameters.resetSpring();
+                    sGS.playSound(2);
+                }
+                else
+                {
+                    sGS.playSound(1);
+                    view.setPaused(true);
+                    parameters.setDeath();
+                }
             }
-            else
+            if(mSnake.detectEdge())
             {
                 sGS.playSound(1);
                 view.setPaused(true);
                 parameters.setDeath();
             }
         }
-        if(mSnake.detectEdge())
-        {
-            sGS.playSound(1);
-            view.setPaused(true);
-            parameters.setDeath();
-        }
+        // Does the Snake Collide into anything that is collidable
+
+
+        //remove objects that need removing
+        objects.removeCollidableObject();
         parameters.updateSpMult();
     }
 //*Tiaera: } else {
@@ -262,10 +280,22 @@ class SnakeGame implements Runnable, OnTouch {
     public void update(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-                if (view.getPaused()) {
-                    view.setPaused(false);
-                    newGame();
+                if (view.getPaused())
+                {
 
+                }
+                if (view.getPaused()) {
+                    if(parameters.getGameOver())
+                    {
+                        parameters.resetDeath();
+                        parameters.setShowScore(true);
+                    }
+                    else
+                    {
+                        view.setPaused(false);
+                        parameters.setShowScore(false);
+                        newGame();
+                    }
                     // Don't want to process snake direction for this tap
 
                 }
