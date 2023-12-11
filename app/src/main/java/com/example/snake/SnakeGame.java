@@ -70,8 +70,6 @@ class SnakeGame implements Runnable, OnTouch {
         parameters = new GameParameters();
         collide = new Collide(parameters,mSnake,sGS,objects);
         TopRight = size.x;
-
-
         System.out.println(prefs.getInt("hi_score",0));
         parameters.setHighScore(prefs.getInt("hi_score",0));
 
@@ -121,9 +119,6 @@ class SnakeGame implements Runnable, OnTouch {
         parameters.resetDeath();
 
         mBadApple.spawn();
-        // Reset the mScore
-        parameters.resetScore();
-
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -331,8 +326,6 @@ class SnakeGame implements Runnable, OnTouch {
                     // Don't want to process snake direction for this tap
 
                 }
-
-
 
                       /*  float x = motionEvent.getX();
                         float y = motionEvent.getY();

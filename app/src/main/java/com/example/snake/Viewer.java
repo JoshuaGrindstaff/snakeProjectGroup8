@@ -35,7 +35,7 @@ public class Viewer extends SurfaceView implements Subject{
     private void drawHighScore(Canvas canvas, Paint paint,GameParameters parameters)
     {
 // Draw the game over screen
-        canvas.drawColor(Color.argb(255, 26, 128, 182));
+        mCanvas.drawColor(Color.argb(255, 0, 0, 0));
 
         // Set the size and color of the paint for the text
         paint.setColor(Color.argb(255, 255, 255, 255));
@@ -86,7 +86,8 @@ public class Viewer extends SurfaceView implements Subject{
 //*Tiaera: if (!mPaused) {
 
             // Fill the screen with a color
-            mCanvas.drawColor(Color.argb(255, 26, 128, 182));
+            //mCanvas.drawColor(Color.argb(255, 26, 128, 182));
+            mCanvas.drawColor(Color.argb(255, 5, 5, 5));
 
             // Set the size and color of the mPaint for the text
 
@@ -118,7 +119,7 @@ public class Viewer extends SurfaceView implements Subject{
 
                 // Draw the message
                 // We will give this an international upgrade soon
-                mCanvas.drawText("TEST!", 200, 700, mPaint);
+                mCanvas.drawText("START", 200, 550, mPaint);
                 }
 
 
