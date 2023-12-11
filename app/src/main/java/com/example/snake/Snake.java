@@ -25,7 +25,6 @@ class Snake {
     // Where is the centre of the screen
     // horizontally in pixels?
     private int halfWayPoint;
-
     // For tracking movement Heading
     private enum Heading {
         UP, RIGHT, DOWN, LEFT
@@ -163,10 +162,33 @@ class Snake {
         }
 
     }
+    boolean detectEdge()
+    {
+        if (segmentLocations.get(0).x == -1 ||
+                segmentLocations.get(0).x > mMoveRange.x ||
+                segmentLocations.get(0).y == -1 ||
+                segmentLocations.get(0).y > mMoveRange.y)
+        {
+            return true;
+        }
+        return false;
+    }
+    boolean detectSelf()
+    {
+        for (int i = segmentLocations.size() - 1; i > 0; i--) {
+            // Have any of the sections collided with the head
+            if (segmentLocations.get(0).x == segmentLocations.get(i).x &&
+                    segmentLocations.get(0).y == segmentLocations.get(i).y)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    boolean detectDeath() {
+  /*  boolean detectDeath() {
         // Has the snake died?
-        boolean dead = false;
+        dead = false;
 
         // Hit any of the screen edges
         if (segmentLocations.get(0).x == -1 ||
@@ -187,7 +209,7 @@ class Snake {
             }
         }
         return dead;
-    }
+    }*/
     // Add a new Point to the list
     // located off-screen.
     // This is OK because on the next call to

@@ -1,9 +1,12 @@
 package com.example.snake;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,35 +22,64 @@ public class Viewer extends SurfaceView implements Subject{
     private SurfaceHolder mSurfaceHolder;
     private Paint mPaint;
     private MotionEvent motionEvent;
+    private Context context;
+    private Point size;
 
-
-    Viewer(Context context)
+    Viewer(Context context, Point size)
     {
         super(context);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
+        this.context = context;
+        this.size = size;
     }
-    //*Tiaera: private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
-    //    // Draw the game over screen
-    //    canvas.drawColor(Color.argb(255, 26, 128, 182));
-    //
-    //    // Set the size and color of the paint for the text
-    //    paint.setColor(Color.argb(255, 255, 255, 255));
-    //    paint.setTextSize(120);
-    //
-    //    // Draw the final score
-    //    canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
-    //
-    //    // Set the size and color of the paint for the options
-    //    paint.setTextSize(80);
-    //
-    //    // Draw the restart option
-    //    canvas.drawText("Restart", 200, 400, paint);
-    //
-    //    // Draw the return to start screen option
-    //    canvas.drawText("Return to Start", 200, 600, paint);
-    //}
-    public void updateViewer(int mScore,Snake mSnake,Apple mApple, BadApple mBadApple, GameObjectLists objects)
+    private void drawHighScore(Canvas canvas, Paint paint,GameParameters parameters)
+    {
+// Draw the game over screen
+        canvas.drawColor(Color.argb(255, 26, 128, 182));
+
+        // Set the size and color of the paint for the text
+        paint.setColor(Color.argb(255, 255, 255, 255));
+        paint.setTextSize(120);
+
+        // Set the size and color of the paint for the options
+        paint.setTextSize(80);
+
+        // Draw the restart option
+        canvas.drawText("High Score", 50, 100, paint);
+
+        //
+        canvas.drawText(""+parameters.getHighScore(), 100, 300, paint);
+    }
+    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
+        // Draw the game over screen
+//        //canvas.drawColor(Color.argb(255, 26, 128, 182));
+//
+//        // Set the size and color of the paint for the text
+//        //paint.setColor(Color.argb(255, 255, 255, 255));
+//        //paint.setTextSize(120);
+//
+//        // Draw the final score
+//        canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
+//
+//        // Set the size and color of the paint for the options
+//        paint.setTextSize(80);
+//
+//        // Draw the restart option
+//        canvas.drawText("Restart", 200, 400, paint);
+//
+//        // Draw the return to start screen option
+//        canvas.drawText("Return to Start", 200, 600, paint);
+
+        // Load the image to the bitmap
+        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.gameoverscrn);
+
+        // Resize the bitmap
+        mBitmapGameOverScrn = Bitmap.createScaledBitmap((Bitmap) mBitmapGameOverScrn, size.x, size.y, false);
+        canvas.drawBitmap((Bitmap) mBitmapGameOverScrn,
+                0,0, paint);
+    }
+    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
@@ -64,7 +96,9 @@ public class Viewer extends SurfaceView implements Subject{
 
 
             // Draw the score
-            mCanvas.drawText("" + mScore, 20, 120, mPaint);
+            mCanvas.drawText("" + parameters.getScore(), 20, 120, mPaint);
+            // Draw Multiplier
+            mCanvas.drawText("X" + parameters.getMult(), 180, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
             mBadApple.draw(mCanvas, mPaint);
@@ -87,6 +121,13 @@ public class Viewer extends SurfaceView implements Subject{
                 mCanvas.drawText("TEST!", 200, 700, mPaint);
 
                 }
+                if (parameters.getGameOver()){
+                    drawGameOverScreen(mCanvas,mPaint, parameters.getScore());
+                }
+                if(parameters.getShowScore())
+                {
+                    drawHighScore(mCanvas,mPaint,parameters);
+                }
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
 
         }
@@ -94,23 +135,7 @@ public class Viewer extends SurfaceView implements Subject{
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         this.motionEvent = motionEvent;
-        //Tiaera: if (mPaused) {
-        //        float x = motionEvent.getX();
-        //        float y = motionEvent.getY();
-        //
-        //        // Check if the touch is within the restart option
-        //        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
-        //            // Restart the game
-        //            setPaused(false);
-        //            notifyObservers(); // Notify SnakeGame to restart
-        //        }
-        //
-        //        // Check if the touch is within the return to start screen option
-        //        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
-        //            // Handle returning to the start screen (implement as needed)
-        //            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
-        //        }
-        //    } else {
+
         notifyObservers();
         return true;
     }

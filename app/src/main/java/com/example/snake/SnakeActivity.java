@@ -27,7 +27,7 @@ public class SnakeActivity extends Activity {
         display.getSize(size);
 
         // Create a new instance of the SnakeEngine class
-        view = new Viewer(this);
+        view = new Viewer(this,size);
         mSnakeGame = new SnakeGame(this,size,view);
         view.registerObserver(mSnakeGame);
         // Create a new instance of the Draw clas

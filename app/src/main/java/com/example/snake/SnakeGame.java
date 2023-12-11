@@ -1,6 +1,7 @@
 package com.example.snake;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
@@ -17,6 +18,7 @@ class SnakeGame implements Runnable, OnTouch {
     // Control pausing between updates
     private long mNextFrameTime;
     // Is the game currently playing and or paused?
+    private long mNextMoveTime;
     private volatile boolean mPlaying = false;
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 40;
@@ -35,7 +37,7 @@ class SnakeGame implements Runnable, OnTouch {
    private int blockSize;
     private GameParameters parameters;
    private GameObjectLists objects;
-
+    private SharedPreferences.Editor mEditor;
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size,Viewer view) {
@@ -53,6 +55,10 @@ class SnakeGame implements Runnable, OnTouch {
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         //Added to list of collidable objects
         objects.addCollidableObject(mApple);
+        //Code from TextBook
+        SharedPreferences prefs;
+        prefs = context.getSharedPreferences("HiScore",Context.MODE_PRIVATE);
+        mEditor = prefs.edit();
 
         mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         objects.addCollidableObject(mBadApple);
@@ -61,6 +67,10 @@ class SnakeGame implements Runnable, OnTouch {
 
         parameters = new GameParameters();
         collide = new Collide(parameters,mSnake,sGS,objects);
+        System.out.println(prefs.getInt("hi_score",0));
+        parameters.setHighScore(prefs.getInt("hi_score",0));
+
+
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -100,9 +110,12 @@ class SnakeGame implements Runnable, OnTouch {
 
         // Get the apple ready for dinner
         mApple.spawn();
+
+
+        // Calls resetDeath in Parameters
+        parameters.resetDeath();
+
         mBadApple.spawn();
-        // Reset the mScore
-        parameters.resetScore();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -120,16 +133,39 @@ class SnakeGame implements Runnable, OnTouch {
                 }
             }
             //System.out.println("update time");
-            view.updateViewer(parameters.getScore(),mSnake,mApple,mBadApple,objects);
+
+            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects);
+
         }
     }
 
 
     // Check to see if it is time for an update
+    public boolean moveRequired()
+    {
+        // Run at 10 frames per second
+        final long TARGET_MPS = 10;
+        // There are 1000 milliseconds in a second
+        final long MILLIS_PER_SECOND = 1000;
+
+        // Are we due to update the frame
+        if(mNextMoveTime <= System.currentTimeMillis()) {
+            // Tenth of a second has passed
+
+            // Setup when the next update will be triggered
+            mNextMoveTime = (long) (System.currentTimeMillis()
+                    + MILLIS_PER_SECOND / (TARGET_MPS * parameters.getSpMult()));
+
+            // Return true so that the update and draw
+            // methods are executed
+            return true;
+        }
+        return false;
+    }
     public boolean updateRequired() {
 
         // Run at 10 frames per second
-        final long TARGET_FPS = 10;
+        final long TARGET_FPS = 60;
         // There are 1000 milliseconds in a second
         final long MILLIS_PER_SECOND = 1000;
 
@@ -138,8 +174,8 @@ class SnakeGame implements Runnable, OnTouch {
             // Tenth of a second has passed
 
             // Setup when the next update will be triggered
-            mNextFrameTime =System.currentTimeMillis()
-                    + MILLIS_PER_SECOND / TARGET_FPS;
+            mNextFrameTime = (long) (System.currentTimeMillis()
+                                + MILLIS_PER_SECOND / (TARGET_FPS));
 
             // Return true so that the update and draw
             // methods are executed
@@ -156,75 +192,51 @@ class SnakeGame implements Runnable, OnTouch {
         //Spawn Power Ups
         if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
         {
-            Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-            objects.addPowerList(spring);
-            objects.addCollidableObject(spring);
-            System.out.println("Loading Spring");
-            spring.spawn();
+            //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,context);
+            objects.addPowerList(power);
+            objects.addCollidableObject(power);
+            //System.out.println("Loading Spring");
+            power.spawn();
         }
         // Move the snake
-
-        mSnake.move();
-        // Does the Snake Collide into anything that is collidable
-
-        for(Collidable collidable : objects.getCollidableObjects())
-        {
-            if(mSnake.checkCollision(collidable))
+        if(moveRequired()) {
+            mSnake.move();
+            for(Collidable collidable : objects.getCollidableObjects())
             {
-                collide.collide(collidable);
+                if(mSnake.checkCollision(collidable))
+                {
+                    collide.collide(collidable);
+                }
+
             }
-
-        }
-        System.out.println("" + objects.getCollidableObjectsSize());
-        objects.removeCollidableObject();
-
-
-        /*// Collisions with Apple
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkCollision(mApple)){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
-            mApple.spawn();
-
-            // Add to  mScore
-            parameters.addScore(1);
-            // Add length to snake
-
-            mSnake.makeLonger();
-            // Play a sound
-            sGS.playSound(0);
-        }
-
-        //Collisions with powerups
-        for(int i = 0; i < powerList.size();i++)
-        {
-           if(mSnake.checkCollision(powerList.get(i)))
-           {
-               parameters.setSpring();
-               powerList.get(i).despawn();
-               powerList.remove(i);
-           }
-
-        }
-
-        }*/
-
-
-        // Did the snake die?
-        if (mSnake.detectDeath()) {
-            // Pause the game ready to start again
-            if(parameters.getSpring())
-            {
-                parameters.resetSpring();
-                sGS.playSound(2);
+            if (mSnake.detectSelf()) {
+                // Pause the game ready to start again
+                if(parameters.getSpring())
+                {
+                    parameters.resetSpring();
+                    sGS.playSound(2);
+                }
+                else
+                {
+                    sGS.playSound(1);
+                    view.setPaused(true);
+                    parameters.setDeath();
+                }
             }
-            else
+            if(mSnake.detectEdge())
             {
                 sGS.playSound(1);
                 view.setPaused(true);
+                parameters.setDeath();
             }
         }
+        // Does the Snake Collide into anything that is collidable
 
+
+        //remove objects that need removing
+        objects.removeCollidableObject();
+        parameters.updateSpMult();
     }
 //*Tiaera: } else {
 //        // Handle touch events when the game is paused (game over screen)
@@ -277,15 +289,45 @@ class SnakeGame implements Runnable, OnTouch {
     public void update(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-                if (view.getPaused()) {
-                    view.setPaused(false);
-                    newGame();
+                if (view.getPaused())
+                {
 
+                }
+                if (view.getPaused()) {
+                    if(parameters.getGameOver())
+                    {
+                        mEditor.putInt("hi_score", parameters.getHighScore());
+                        mEditor.commit();
+                        parameters.resetDeath();
+                        parameters.setShowScore(true);
+                    }
+                    else
+                    {
+                        view.setPaused(false);
+                        parameters.setShowScore(false);
+                        newGame();
+                    }
                     // Don't want to process snake direction for this tap
 
                 }
 
-                // Let the Snake class handle the input
+                      /*  float x = motionEvent.getX();
+                        float y = motionEvent.getY();
+
+                        // Check if the touch is within the restart option
+                        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
+                            // Restart the game
+                            view.setPaused(false);
+                            newGame()
+                        }
+
+                        // Check if the touch is within the return to start screen option
+                        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
+                            // Handle returning to the start screen (implement as needed)
+                            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
+                        }
+                    } else {*/
+                 //Let the Snake class handle the input
                 mSnake.switchHeading(motionEvent);
                 break;
 
@@ -294,47 +336,4 @@ class SnakeGame implements Runnable, OnTouch {
         }
     }
 }
-//*Tiaera: private void saveHighScores() {
-//    // Use SharedPreferences for simplicity (you can use a file or a database for more complex scenarios)
-//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
-//    SharedPreferences.Editor editor = preferences.edit();
-//
-//    // Convert the list of HighScore objects to a JSON string
-//    Gson gson = new Gson();
-//    String json = gson.toJson(highScores);
-//
-//    // Save the JSON string
-//    editor.putString("highScores", json);
-//    editor.apply();
-//}
-//
-//private void loadHighScores() {
-//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
-//    String json = preferences.getString("highScores", "");
-//
-//    // Convert the JSON string back to a list of HighScore objects
-//    Gson gson = new Gson();
-//    Type type = new TypeToken<List<HighScore>>(){}.getType();
-//    highScores = gson.fromJson(json, type);
-//
-//    if (highScores == null) {
-//        highScores = new ArrayList<>();
-//    }
-//}
-//public class HighScoresActivity extends AppCompatActivity {
-//    // ...
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_high_scores);
-//
-//        // Retrieve high scores from SnakeGame
-//        SnakeGame snakeGame = new SnakeGame(getApplicationContext());
-//        List<HighScore> highScores = snakeGame.getHighScores();
-//
-//        // Display high scores in a ListView or RecyclerView
-//        // You may need to implement a custom adapter for better control over the layout
-//        // ...
-//    }
-//}
+//*Tiaera:

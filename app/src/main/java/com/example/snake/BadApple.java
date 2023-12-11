@@ -21,7 +21,7 @@ class BadApple implements Collidable {
         mSize = s;
         location.x = -10;
 
-        mBitmapBadApple = BitmapFactory.decodeResource(context.getResources(), R.drawable.bad_apple);
+        mBitmapBadApple = BitmapFactory.decodeResource(context.getResources(), R.drawable.defaultpickup);
         mBitmapBadApple = Bitmap.createScaledBitmap(mBitmapBadApple, s, s, false);
     }
 
