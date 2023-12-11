@@ -13,7 +13,7 @@ class SnakeGame implements Runnable, OnTouch {
 
     //Branch Test
     // Objects for the game loop/thread
-    private final int MAX_NUMBER_OF_POWERUPS = 2;
+    private final int MAX_NUMBER_OF_POWERUPS = 3;
     private Thread mThread = null;
     // Control pausing between updates
     private long mNextFrameTime;
@@ -28,7 +28,7 @@ class SnakeGame implements Runnable, OnTouch {
     private Snake mSnake;
     // And an apple
    private Apple mApple;
-   private BadApple mBadApple;
+   //private BadApple mBadApple;
    private Audio sGS;
    private Viewer view;
    private Context context;
@@ -62,8 +62,8 @@ class SnakeGame implements Runnable, OnTouch {
         prefs = context.getSharedPreferences("HiScore",Context.MODE_PRIVATE);
         mEditor = prefs.edit();
 
-        mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
-        objects.addCollidableObject(mBadApple);
+        //mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        //objects.addCollidableObject(mBadApple);
 
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
@@ -118,7 +118,7 @@ class SnakeGame implements Runnable, OnTouch {
         // Calls resetDeath in Parameters
         parameters.resetDeath();
 
-        mBadApple.spawn();
+        //mBadApple.spawn();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -137,7 +137,7 @@ class SnakeGame implements Runnable, OnTouch {
             }
             //System.out.println("update time");
 
-            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects, mPlaying);
+            view.updateViewer(parameters,mSnake,mApple,objects, mPlaying);
 
         }
     }
@@ -193,7 +193,7 @@ class SnakeGame implements Runnable, OnTouch {
     public void update() {
 //*Tiaera: if (!mPaused) {
         //Spawn Power Ups
-        if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(100))
+        if(objects.getPowerListSize() < MAX_NUMBER_OF_POWERUPS && 3 > random.nextInt(600))
         {
             //Spring spring = new Spring(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
             PowerUps power = new PowerUps(new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh),blockSize,context);
@@ -201,6 +201,14 @@ class SnakeGame implements Runnable, OnTouch {
             objects.addCollidableObject(power);
             //System.out.println("Loading Spring");
             power.spawn();
+        }
+        for(PowerUps power : objects.getPowerList())
+        {
+            if(power.timer())
+            {
+                objects.removePowerList(power);
+                break;
+            }
         }
         // Move the snake
         if(moveRequired()) {
@@ -325,27 +333,11 @@ class SnakeGame implements Runnable, OnTouch {
 
                 }
 
-                      /*  float x = motionEvent.getX();
-                        float y = motionEvent.getY();
+                    float x = motionEvent.getX();
+                    float y = motionEvent.getY();
+                    if (!(x >= TopRight - 100 && x <= TopRight && y >= 0 && y <= 100))
+                        mSnake.switchHeading(motionEvent);
 
-                        // Check if the touch is within the restart option
-                        if (x >= 200 && x <= 500 && y >= 400 && y <= 480) {
-                            // Restart the game
-                            view.setPaused(false);
-                            newGame()
-                        }
-
-                        // Check if the touch is within the return to start screen option
-                        if (x >= 200 && x <= 700 && y >= 600 && y <= 680) {
-                            // Handle returning to the start screen (implement as needed)
-                            // You might want to create a method in SnakeActivity to start a new game or return to the start screen.
-                        }
-                    } else {*/
-                 //Let the Snake class handle the input
-                float x = motionEvent.getX();
-                float y = motionEvent.getY();
-                if (!(x >= TopRight - 100 && x <= TopRight  && y >= 0 && y <= 100))
-                mSnake.switchHeading(motionEvent);
                 break;
 
             default:

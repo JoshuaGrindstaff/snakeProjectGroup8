@@ -78,7 +78,7 @@ public class Viewer extends SurfaceView implements Subject{
         canvas.drawBitmap((Bitmap) mBitmapGameOverScrn,
                 0,0, paint);
     }
-    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects, boolean mPlaying)
+    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,GameObjectLists objects, boolean mPlaying)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
@@ -101,7 +101,7 @@ public class Viewer extends SurfaceView implements Subject{
             mCanvas.drawText("X" + parameters.getMult(), 180, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
-            mBadApple.draw(mCanvas, mPaint);
+            //mBadApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
             for(PowerUps power : objects.getPowerList())
                 power.draw(mCanvas, mPaint);

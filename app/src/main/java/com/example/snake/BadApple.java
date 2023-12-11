@@ -1,3 +1,4 @@
+/*
 package com.example.snake;
 
 import android.content.Context;
@@ -41,3 +42,4 @@ class BadApple implements Collidable {
         canvas.drawBitmap(mBitmapBadApple, location.x * mSize, location.y * mSize, paint);
     }
 }
+*/

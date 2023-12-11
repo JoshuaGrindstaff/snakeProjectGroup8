@@ -18,15 +18,18 @@ public class PowerUps implements Collidable {
     private Bitmap mBitmapPowerUp;
     private final Random random;
     private final String type;
+    private int time;
+
     public PowerUps(Point sr, int s, Context context)
     {
 
         mSpawnRange = sr;
         mSize = s;
         location.x = -11;
-
+        time = 600;
         random = new Random();
-        switch(random.nextInt(3))
+
+        switch(random.nextInt(4))
         {
             case 0:
                 //Load image into bitmap
@@ -43,6 +46,13 @@ public class PowerUps implements Collidable {
                 mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapLight,mSize,mSize,false);
                 type = "Lightning";
                 break;
+            case 3:
+                //Load image into bitmap
+                Bitmap mBitmapBadApple = BitmapFactory.decodeResource(context.getResources(), R.drawable.bad_apple);
+                //sets Bitmap to be the bit map for Lightning
+                mBitmapPowerUp = Bitmap.createScaledBitmap(mBitmapBadApple,mSize,mSize,false);
+                type = "Bad";
+                break;
             default:
                 //Load image into bitmap
                 Bitmap mBitmapDefault = BitmapFactory.decodeResource(context.getResources(), R.drawable.defaultpickup);
@@ -51,6 +61,16 @@ public class PowerUps implements Collidable {
                 type = "Default";
         }
 
+    }
+    public boolean timer()
+    {
+        if(time > 0)
+        {
+            time--;
+            return false;
+        }
+            despawn();
+            return true;
     }
     public void spawn(){
         // Choose two random values and place the power up
@@ -86,6 +106,5 @@ public class PowerUps implements Collidable {
         else
             System.out.println("is null");
     }
-
 
 }
