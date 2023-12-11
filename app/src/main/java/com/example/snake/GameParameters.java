@@ -6,14 +6,18 @@ public class GameParameters {
     private boolean gameOver;
     private double spMult;
     private double baseSpMult;
+    private boolean showScore;
+    private int highScore;
     public GameParameters()
     {
         score = 0;
         spring = false;
-        spMult = 0.8;
-        baseSpMult = 0.8;
+        spMult = 0.5;
+        baseSpMult = 0.5;
     }
-    public void addScore(int add) {score = score + add;}
+    public void addScore(int add) {
+        score = Math.max(0, score + (add * (int)floor(2*baseSpMult))) ;
+    }
     public void resetScore() {score = 0;}
     public void setSpring() {spring = true;}
     public void resetSpring(){spring = false;}
@@ -24,8 +28,8 @@ public class GameParameters {
     {
         gameOver = true;
         spring = false;
-        spMult = 0.8;
-        baseSpMult = 0.8;
+        spMult = 0.5;
+        baseSpMult = 0.5;
     }
     public void resetDeath()
     {
@@ -35,14 +39,14 @@ public class GameParameters {
     public void setSpMult(long m){spMult = m;}
     public void addSpMult()
     {
-        spMult = spMult + (1/(spMult+2));
+        spMult = spMult + (1);
         baseSpMult = baseSpMult + 0.1;
     }
     public void updateSpMult()
     {
         if(spMult > baseSpMult)
         {
-            spMult = spMult - 0.1;
+            spMult = spMult - 0.05;
         }
         else if(spMult < baseSpMult)
         {
@@ -51,4 +55,18 @@ public class GameParameters {
     }
     public double getSpMult(){return spMult;}
 
+    public boolean getShowScore() {return showScore;}
+    public void setShowScore(boolean s) {showScore = s;}
+    public int getMult(){return (int)floor(2*baseSpMult);}
+    public int getHighScore()
+    {
+        if(score > highScore)
+        {
+            highScore = score;
+        }
+        return highScore;
+    }
+
+    public void setHighScore(int m){highScore = m;
+    System.out.println(highScore);}
 }

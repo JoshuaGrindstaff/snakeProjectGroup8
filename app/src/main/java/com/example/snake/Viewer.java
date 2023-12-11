@@ -1,6 +1,8 @@
 package com.example.snake;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,8 +10,6 @@ import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,38 +21,62 @@ public class Viewer extends SurfaceView implements Subject{
     private SurfaceHolder mSurfaceHolder;
     private Paint mPaint;
     private MotionEvent motionEvent;
-
+    private Context context;
     private Point size;
-
-
 
     Viewer(Context context, Point size)
     {
         super(context);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
+        this.context = context;
         this.size = size;
     }
-    //Tiaera:
-    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
-        // Draw the game over screen
+    private void drawHighScore(Canvas canvas, Paint paint,GameParameters parameters)
+    {
+// Draw the game over screen
         canvas.drawColor(Color.argb(255, 26, 128, 182));
 
         // Set the size and color of the paint for the text
         paint.setColor(Color.argb(255, 255, 255, 255));
         paint.setTextSize(120);
 
-        // Draw the final score
-        canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
-
         // Set the size and color of the paint for the options
         paint.setTextSize(80);
 
         // Draw the restart option
-        canvas.drawText("Restart", 200, 400, paint);
+        canvas.drawText("High Score", 50, 100, paint);
 
-        // Draw the return to start screen option
-        canvas.drawText("Return to Start", 200, 600, paint);
+        //
+        canvas.drawText(""+parameters.getHighScore(), 100, 300, paint);
+    }
+    private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
+        // Draw the game over screen
+//        //canvas.drawColor(Color.argb(255, 26, 128, 182));
+//
+//        // Set the size and color of the paint for the text
+//        //paint.setColor(Color.argb(255, 255, 255, 255));
+//        //paint.setTextSize(120);
+//
+//        // Draw the final score
+//        canvas.drawText("Final Score: " + finalScore, 20, 120, paint);
+//
+//        // Set the size and color of the paint for the options
+//        paint.setTextSize(80);
+//
+//        // Draw the restart option
+//        canvas.drawText("Restart", 200, 400, paint);
+//
+//        // Draw the return to start screen option
+//        canvas.drawText("Return to Start", 200, 600, paint);
+
+        // Load the image to the bitmap
+        Object mBitmapGameOverScrn = BitmapFactory.decodeResource(context.getResources(), R.drawable.gameoverscrn);
+
+        // Resize the bitmap
+        mBitmapGameOverScrn = Bitmap.createScaledBitmap((Bitmap) mBitmapGameOverScrn, size.x, size.y, false);
+        canvas.drawBitmap((Bitmap) mBitmapGameOverScrn,
+                0,0, paint);
     }
     public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects, boolean mPlaying)
     {
@@ -72,6 +96,8 @@ public class Viewer extends SurfaceView implements Subject{
 
             // Draw the score
             mCanvas.drawText("" + parameters.getScore(), 20, 120, mPaint);
+            // Draw Multiplier
+            mCanvas.drawText("X" + parameters.getMult(), 180, 120, mPaint);
 
             mApple.draw(mCanvas, mPaint);
             mBadApple.draw(mCanvas, mPaint);
@@ -98,6 +124,10 @@ public class Viewer extends SurfaceView implements Subject{
 
                 if (parameters.getGameOver()){
                     drawGameOverScreen(mCanvas,mPaint, parameters.getScore());
+                }
+                if(parameters.getShowScore())
+                {
+                    drawHighScore(mCanvas,mPaint,parameters);
                 }
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
 

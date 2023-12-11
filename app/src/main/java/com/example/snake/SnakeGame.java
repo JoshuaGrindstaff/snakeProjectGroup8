@@ -1,6 +1,7 @@
 package com.example.snake;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
@@ -17,6 +18,7 @@ class SnakeGame implements Runnable, OnTouch {
     // Control pausing between updates
     private long mNextFrameTime;
     // Is the game currently playing and or paused?
+    private long mNextMoveTime;
     private volatile boolean mPlaying = false;
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 40;
@@ -35,7 +37,7 @@ class SnakeGame implements Runnable, OnTouch {
    private int blockSize;
     private GameParameters parameters;
    private GameObjectLists objects;
-
+    private SharedPreferences.Editor mEditor;
    private int TopRight;
 
     // This is the constructor method that gets called
@@ -55,6 +57,10 @@ class SnakeGame implements Runnable, OnTouch {
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         //Added to list of collidable objects
         objects.addCollidableObject(mApple);
+        //Code from TextBook
+        SharedPreferences prefs;
+        prefs = context.getSharedPreferences("HiScore",Context.MODE_PRIVATE);
+        mEditor = prefs.edit();
 
         mBadApple = new BadApple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         objects.addCollidableObject(mBadApple);
@@ -64,6 +70,10 @@ class SnakeGame implements Runnable, OnTouch {
         parameters = new GameParameters();
         collide = new Collide(parameters,mSnake,sGS,objects);
         TopRight = size.x;
+
+
+        System.out.println(prefs.getInt("hi_score",0));
+        parameters.setHighScore(prefs.getInt("hi_score",0));
 
 
     }
@@ -139,10 +149,31 @@ class SnakeGame implements Runnable, OnTouch {
 
 
     // Check to see if it is time for an update
+    public boolean moveRequired()
+    {
+        // Run at 10 frames per second
+        final long TARGET_MPS = 10;
+        // There are 1000 milliseconds in a second
+        final long MILLIS_PER_SECOND = 1000;
+
+        // Are we due to update the frame
+        if(mNextMoveTime <= System.currentTimeMillis()) {
+            // Tenth of a second has passed
+
+            // Setup when the next update will be triggered
+            mNextMoveTime = (long) (System.currentTimeMillis()
+                    + MILLIS_PER_SECOND / (TARGET_MPS * parameters.getSpMult()));
+
+            // Return true so that the update and draw
+            // methods are executed
+            return true;
+        }
+        return false;
+    }
     public boolean updateRequired() {
 
         // Run at 10 frames per second
-        final long TARGET_FPS = 10;
+        final long TARGET_FPS = 60;
         // There are 1000 milliseconds in a second
         final long MILLIS_PER_SECOND = 1000;
 
@@ -152,7 +183,7 @@ class SnakeGame implements Runnable, OnTouch {
 
             // Setup when the next update will be triggered
             mNextFrameTime = (long) (System.currentTimeMillis()
-                                + MILLIS_PER_SECOND / (TARGET_FPS * parameters.getSpMult()));
+                                + MILLIS_PER_SECOND / (TARGET_FPS));
 
             // Return true so that the update and draw
             // methods are executed
@@ -177,43 +208,42 @@ class SnakeGame implements Runnable, OnTouch {
             power.spawn();
         }
         // Move the snake
-
-        mSnake.move();
-        // Does the Snake Collide into anything that is collidable
-
-        for(Collidable collidable : objects.getCollidableObjects())
-        {
-            if(mSnake.checkCollision(collidable))
+        if(moveRequired()) {
+            mSnake.move();
+            for(Collidable collidable : objects.getCollidableObjects())
             {
-                collide.collide(collidable);
+                if(mSnake.checkCollision(collidable))
+                {
+                    collide.collide(collidable);
+                }
+
             }
-
-        }
-        System.out.println("" + objects.getCollidableObjectsSize());
-        objects.removeCollidableObject();
-
-
-        // Did the snake die?
-        if (mSnake.detectSelf()) {
-            // Pause the game ready to start again
-            if(parameters.getSpring())
-            {
-                parameters.resetSpring();
-                sGS.playSound(2);
+            if (mSnake.detectSelf()) {
+                // Pause the game ready to start again
+                if(parameters.getSpring())
+                {
+                    parameters.resetSpring();
+                    sGS.playSound(2);
+                }
+                else
+                {
+                    sGS.playSound(1);
+                    view.setPaused(true);
+                    parameters.setDeath();
+                }
             }
-            else
+            if(mSnake.detectEdge())
             {
                 sGS.playSound(1);
                 view.setPaused(true);
                 parameters.setDeath();
             }
         }
-        if(mSnake.detectEdge())
-        {
-            sGS.playSound(1);
-            view.setPaused(true);
-            parameters.setDeath();
-        }
+        // Does the Snake Collide into anything that is collidable
+
+
+        //remove objects that need removing
+        objects.removeCollidableObject();
         parameters.updateSpMult();
     }
 //*Tiaera: } else {
@@ -285,9 +315,19 @@ class SnakeGame implements Runnable, OnTouch {
 
 
                 if (view.getPaused()) {
-                    view.setPaused(false);
-                    newGame();
-
+                    if(parameters.getGameOver())
+                    {
+                        mEditor.putInt("hi_score", parameters.getHighScore());
+                        mEditor.commit();
+                        parameters.resetDeath();
+                        parameters.setShowScore(true);
+                    }
+                    else
+                    {
+                        view.setPaused(false);
+                        parameters.setShowScore(false);
+                        newGame();
+                    }
                     // Don't want to process snake direction for this tap
 
                 }
@@ -319,47 +359,4 @@ class SnakeGame implements Runnable, OnTouch {
         }
     }
 }
-//*Tiaera: private void saveHighScores() {
-//    // Use SharedPreferences for simplicity (you can use a file or a database for more complex scenarios)
-//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
-//    SharedPreferences.Editor editor = preferences.edit();
-//
-//    // Convert the list of HighScore objects to a JSON string
-//    Gson gson = new Gson();
-//    String json = gson.toJson(highScores);
-//
-//    // Save the JSON string
-//    editor.putString("highScores", json);
-//    editor.apply();
-//}
-//
-//private void loadHighScores() {
-//    SharedPreferences preferences = context.getSharedPreferences("HighScores", Context.MODE_PRIVATE);
-//    String json = preferences.getString("highScores", "");
-//
-//    // Convert the JSON string back to a list of HighScore objects
-//    Gson gson = new Gson();
-//    Type type = new TypeToken<List<HighScore>>(){}.getType();
-//    highScores = gson.fromJson(json, type);
-//
-//    if (highScores == null) {
-//        highScores = new ArrayList<>();
-//    }
-//}
-//public class HighScoresActivity extends AppCompatActivity {
-//    // ...
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_high_scores);
-//
-//        // Retrieve high scores from SnakeGame
-//        SnakeGame snakeGame = new SnakeGame(getApplicationContext());
-//        List<HighScore> highScores = snakeGame.getHighScores();
-//
-//        // Display high scores in a ListView or RecyclerView
-//        // You may need to implement a custom adapter for better control over the layout
-//        // ...
-//    }
-//}
+//*Tiaera:

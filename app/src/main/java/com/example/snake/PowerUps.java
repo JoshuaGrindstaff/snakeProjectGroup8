@@ -26,7 +26,7 @@ public class PowerUps implements Collidable {
         location.x = -11;
 
         random = new Random();
-        switch(random.nextInt(2))
+        switch(random.nextInt(3))
         {
             case 0:
                 //Load image into bitmap
@@ -36,6 +36,7 @@ public class PowerUps implements Collidable {
                 type = "Spring";
                 break;
             case 1:
+            case 2:
                 //Load image into bitmap
                 Bitmap mBitmapLight = BitmapFactory.decodeResource(context.getResources(), R.drawable.lightning);
                 //sets Bitmap to be the bit map for Lightning
