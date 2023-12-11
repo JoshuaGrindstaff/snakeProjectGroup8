@@ -307,8 +307,6 @@ class SnakeGame implements Runnable, OnTouch {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
                 checkForPause(motionEvent);
-
-
                 if (view.getPaused()) {
                     if(parameters.getGameOver())
                     {
@@ -344,6 +342,9 @@ class SnakeGame implements Runnable, OnTouch {
                         }
                     } else {*/
                  //Let the Snake class handle the input
+                float x = motionEvent.getX();
+                float y = motionEvent.getY();
+                if (!(x >= TopRight - 100 && x <= TopRight  && y >= 0 && y <= 100))
                 mSnake.switchHeading(motionEvent);
                 break;
 
