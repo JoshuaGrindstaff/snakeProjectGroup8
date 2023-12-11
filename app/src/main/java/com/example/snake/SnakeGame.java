@@ -36,6 +36,8 @@ class SnakeGame implements Runnable, OnTouch {
     private GameParameters parameters;
    private GameObjectLists objects;
 
+   private int TopRight;
+
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size,Viewer view) {
@@ -61,6 +63,9 @@ class SnakeGame implements Runnable, OnTouch {
 
         parameters = new GameParameters();
         collide = new Collide(parameters,mSnake,sGS,objects);
+        TopRight = size.x;
+
+
     }
 //*Tiaera: public class SnakeGame {
 //    private List<HighScore> highScores;
@@ -127,7 +132,7 @@ class SnakeGame implements Runnable, OnTouch {
             }
             //System.out.println("update time");
 
-            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects);
+            view.updateViewer(parameters,mSnake,mApple,mBadApple,objects, mPlaying);
 
         }
     }
@@ -258,10 +263,27 @@ class SnakeGame implements Runnable, OnTouch {
 
     }
 
+    public void checkForPause(MotionEvent motionEvent) {
+        float x = motionEvent.getX();
+        float y = motionEvent.getY();
+        if(!mPlaying) {
+            resume();
+
+        }
+        // Check if the touch is within the restart option
+        if (x >= TopRight - 100 && x <= TopRight  && y >= 0 && y <= 100) {
+            // Restart the game
+            pause();
+        }
+    }
+
     @Override
     public void update(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
+                checkForPause(motionEvent);
+
+
                 if (view.getPaused()) {
                     view.setPaused(false);
                     newGame();
@@ -269,6 +291,8 @@ class SnakeGame implements Runnable, OnTouch {
                     // Don't want to process snake direction for this tap
 
                 }
+
+
 
                       /*  float x = motionEvent.getX();
                         float y = motionEvent.getY();

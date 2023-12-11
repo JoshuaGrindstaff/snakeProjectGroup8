@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,16 @@ public class Viewer extends SurfaceView implements Subject{
     private Paint mPaint;
     private MotionEvent motionEvent;
 
+    private Point size;
 
-    Viewer(Context context)
+
+
+    Viewer(Context context, Point size)
     {
         super(context);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
+        this.size = size;
     }
     //Tiaera:
     private void drawGameOverScreen(Canvas canvas, Paint paint, int finalScore) {
@@ -48,7 +54,7 @@ public class Viewer extends SurfaceView implements Subject{
         // Draw the return to start screen option
         canvas.drawText("Return to Start", 200, 600, paint);
     }
-    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects)
+    public void updateViewer(GameParameters parameters,Snake mSnake,Apple mApple,BadApple mBadApple,GameObjectLists objects, boolean mPlaying)
     {
         mCanvas = mSurfaceHolder.lockCanvas();
         if (mSurfaceHolder.getSurface().isValid() && mCanvas !=null) {
@@ -72,6 +78,7 @@ public class Viewer extends SurfaceView implements Subject{
             mSnake.draw(mCanvas, mPaint);
             for(PowerUps power : objects.getPowerList())
                 power.draw(mCanvas, mPaint);
+            mCanvas.drawText("||", size.x - 70, 100, mPaint);
             //*Tiaera: } else {
 //            // Game over screen
 //            drawGameOverScreen(mCanvas, mPaint, mScore);
@@ -86,8 +93,9 @@ public class Viewer extends SurfaceView implements Subject{
                 // Draw the message
                 // We will give this an international upgrade soon
                 mCanvas.drawText("TEST!", 200, 700, mPaint);
-
                 }
+
+
                 if (parameters.getGameOver()){
                     drawGameOverScreen(mCanvas,mPaint, parameters.getScore());
                 }
