@@ -47,8 +47,10 @@ public class Collide {
                     return;
                 case "Lightning":
                     parameters.addSpMult();
+                    return;
                 case "Bad":
                     parameters.addScore(-1);
+                    return;
                 default:
                     System.out.println("No PowerUps of Such Type");
             }
